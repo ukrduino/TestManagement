@@ -1,0 +1,24 @@
+{% extends 'BasePage.html' %}
+{% load staticfiles %}
+
+{% block jobs_page %}
+    <div class="row page_content">
+        {% for job_in_header, builds in jobs_with_builds.items %}
+            <h4></h4>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th class="counter">{{ forloop.counter }}</th>
+                    <th><a href="#" id="job_in_header_link" data-job_id="{{ job_in_header.id }}"
+                           class="job_title_link">{{ job_in_header.job_name }}</a></th>
+                    {% for build in builds %}
+                        <th class="build"><a href="#">#{{ build.build_number }}</a></th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody id="{{ job_in_header.id }}">
+                </tbody>
+            </table>
+        {% endfor %}
+    </div>
+{% endblock %}

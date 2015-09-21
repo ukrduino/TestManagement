@@ -1,0 +1,13 @@
+{% for test, results in tests_with_results.items %}
+    <tr>
+        <td class="counter">{{ forloop.counter }}</td>
+        <td>{{ test.test_class_name }}</td>
+        {% for result in results %}
+            {% if result.test_passed %}
+                <td class="success build">{{ result.id }}</td>
+            {% else %}
+                <td class="danger build">{{ result.id }}</td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+{% endfor %}

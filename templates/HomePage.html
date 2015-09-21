@@ -1,0 +1,62 @@
+{% extends 'BasePage.html' %}
+{% load staticfiles %}
+
+{% block home_page %}
+    <div class="jumbotron page_content">
+        <h1>Welcome to auto-tests management!</h1>
+
+        <p>For now we have
+            <a href="{% url 'show_all_test_cases' %}" class="home_page_big_numbers">
+                {% if test_cases_number > 0 %}
+                    {{ test_cases_number }}
+                {% else %}
+                    0
+                {% endif %}
+            </a>
+            automated test cases</p>
+
+        <p>They implemented in
+            <a href="#" class="home_page_big_numbers">
+                {% if test_classes_number > 0 %}
+                    {{ test_classes_number }}
+                {% else %}
+                    0
+                {% endif %}
+            </a>
+            test methods (selenium auto-tests)</p>
+
+        <p>These tests are run in
+            <a href="#" class="home_page_big_numbers">
+                {% if jobs_number > 0 %}
+                    {{ jobs_number }}
+                {% else %}
+                    0
+                {% endif %}
+            </a>
+            Jenkins jobs</p>
+
+        <p>We have actual data about last 5 build for each job in
+            <a href="#" class="home_page_big_numbers">
+                {% if builds_number > 0 %}
+                    {{ builds_number }}
+                {% else %}
+                    0
+                {% endif %}
+            </a>
+            build reports</p>
+
+        <p>To retrieve actual data about tests/groups/builds/jobs you have to press "Update" button</p>
+
+        <p>Process will take approx. 20 minutes you will be notified with "Successful" pop up.</p>
+
+
+        <p class="jumbotron_button">
+            <a class="btn btn-primary btn" id="parse_java">Parse java code</a>
+            <span class="glyphicon glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+            <a class="btn btn-primary btn" id="save_instances">Save instances to DB</a>
+            <span class="glyphicon glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+            <a class="btn btn-primary btn" id="get_results_from_jenkins">Get data from Jenkins</a>
+        </p>
+    </div>
+
+{% endblock %}

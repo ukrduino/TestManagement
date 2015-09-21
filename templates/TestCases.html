@@ -1,0 +1,56 @@
+{% extends 'BasePage.html' %}
+{% load staticfiles %}
+
+{% block test_cases_page %}
+    <div class="row page_content">
+        {% for test_case, test_class_with_test_groups in test_case_with_test_class.items %}
+            {% for test_class, test_grops in test_class_with_test_groups.items %}
+                {% if test_class.test_class_enabled %}
+                    <div class="panel panel-success">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                # {{ test_case.id }}
+                                <a href="{{ test_case.test_case_link }}" target="_blank">
+                                    {{ test_case.test_case_name }}
+                                </a> (
+
+                                {% for group in test_grops %}
+                                    {{ group.test_group_name }}
+                                {% endfor %}
+                            )
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>Test class: {{ test_class.test_class_name }}</p>
+
+                            <p style="color: green">Enabled</p>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="panel panel-danger">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <a href="{{ test_case.test_case_link }}" target="_blank">
+                                    {{ test_case.test_case_name }}
+                                </a>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>Test class: {{ test_class.test_class_name }}</p>
+
+                            <p style="color: red">Disabled</p>
+                        </div>
+                        <div class="panel-footer">
+                            <p>Blocked by ticket
+                                <a href="https://trac.roboreus.com/trac/ticket/{{ test_class.test_class_blocked_by_ticket }}"
+                                   target="_blank">
+                                    #{{ test_class.test_class_blocked_by_ticket }}
+                                </a> - Comment: {{ test_class.test_class_comment }}
+                            <p/>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endblock %}
