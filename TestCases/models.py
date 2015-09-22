@@ -1,4 +1,8 @@
+import logging
+
 from django.db import models
+
+logger = logging.getLogger(__name__)
 
 
 class Job(models.Model):
@@ -111,7 +115,7 @@ class TestResult(models.Model):
         verbose_name = 'Test execution result'
         verbose_name_plural = 'Test execution results'
 
-    test_passed = models.BooleanField(verbose_name="Test passed")
+    test_passed = models.CharField(verbose_name="Test passed", max_length=10)
     build = models.ForeignKey(JobBuild)
     test_class = models.ForeignKey(TestClass)
 
@@ -122,22 +126,19 @@ class TestResult(models.Model):
         return "TestResult #" + str(self.id)
 
 
-
-
-def create_new_test_result(new_build, test_cl_name, passed):
-    test_class = TestClass.objects.filter(test_class_name__contains=test_cl_name)
-    for tt in test_class:
-        print(tt)
-    if len(test_class) == 1:
-        new_test_result = TestResult(test_class=test_class[0], build=new_build, test_passed=passed)
+def create_new_test_result(build, test_class_name, passed):
+    test_classes = TestClass.objects.filter(test_class_name__contains=test_class_name)
+    if len(test_classes) == 1:
+        new_test_result = TestResult(test_class=test_classes[0], build=build, test_passed=passed)
         new_test_result.save()
-        print(" >>>>>> Saved new test result for " + test_class[0].test_class_name)
-    elif len(test_class) == 0:
-        print(" >>>>>> ERROR - No test class with name " + test_cl_name + "found in DB")
-        print(" >>>>>> Result not saved")
-    elif len(test_class) > 1:
-        print(" >>>>>> ERROR - 2 or more test class with name " + test_cl_name + "found in DB")
-        print(" >>>>>> Result not saved")
+        print(" >>>>>> Saved TestResult#" + str(new_test_result.id) + " for " + test_classes[0].test_class_name)
+    elif len(test_classes) == 0:
+        logger.info(" >>>>>> ERROR - No test class with name " + test_class_name + "found in DB")
+    elif len(test_classes) > 1:
+        logger.info(" >>>>>> ERROR - 2 or more test class with name " + test_class_name + "found in DB")
+        for test in test_classes:
+            logger.info(str(test.id) + test.test_class_name)
+        logger.info(" >>>>>> Result not saved")
 
 
 # http://stackoverflow.com/a/29898483

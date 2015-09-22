@@ -1,12 +1,16 @@
 from django.shortcuts import render_to_response
+
 from django.template import RequestContext
 
 from TestCases.Parser import JavaTestsParser, JenkinsAPI
 from TestCases.models import *
 
+logger = logging.getLogger(__name__)
+
 
 # Site section
 def show_acceptance_jobs(request):
+
     args = dict()
     jobs_with_builds = dict()
     for job in Job.objects.all():
@@ -23,19 +27,14 @@ def show_test_for_jobs(request, job_id):
     for test in tests_for_job:
         results_for_test = list()
         for build in builds:
-            result = TestResult.objects.filter(build__id=build.id).filter(test_class__id=test.id)
+            result = TestResult.objects.filter(build__id=build.id)
             for res in result:
-                print(res.__class__)
-                print(res.test_passed)
-                print(res)
-            print("--------------------")
-            results_for_test.append(result)
-
-        # for res in results_for_test:
-        # print(len(results_for_test))
+                if res.test_class.id == test.id:
+                    results_for_test.append(res)
         tests_with_results[test] = results_for_test
-        # for res in results_for_test:
-        #     print(res)
+    for t, r in tests_with_results.items():
+        print(t)
+        print(r)
     args['tests_with_results'] = tests_with_results
     return render_to_response("TestsForJobPage.html", args, context_instance=RequestContext(request))
 

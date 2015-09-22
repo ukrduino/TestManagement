@@ -1,10 +1,13 @@
 import os
 
 from jenkinsapi.jenkins import Jenkins
+
 from bs4 import BeautifulSoup
 
 from TestCases.models import *
 from TestManagement.local_settings import *
+
+logger = logging.getLogger(__name__)
 
 
 def get_server_instance():
@@ -51,7 +54,6 @@ def save_artifact(artifact):
     if not os.path.exists(TARGET_DIR):
         os.makedirs(TARGET_DIR)
     artifact.save_to_dir(TARGET_DIR)
-    print(" >>>> New report saved to file ")
 
 
 def process_artifact(new_job, build_number, artifact_name):
@@ -65,7 +67,7 @@ def process_artifact(new_job, build_number, artifact_name):
         print(" >>>>> Saving FAILED TESTS ")
         for method in test_methods:
             test_class_name = method.contents[1].get_text().split(".")[1]
-            create_new_test_result(new_build, test_class_name, passed=False)
+            create_new_test_result(new_build, test_class_name, "failed")
             test_classes.add(test_class_name)
     test_methods = soup.find_all(id="skippedTest")
     if len(test_methods) > 0:
@@ -73,14 +75,19 @@ def process_artifact(new_job, build_number, artifact_name):
         for method in test_methods:
             test_class_name = method.contents[1].get_text().split(".")[1]
             if test_class_name not in test_classes:
-                create_new_test_result(new_build, test_class_name, passed=False)
+                create_new_test_result(new_build, test_class_name, "skipped")
+                test_classes.add(test_class_name)
+            else:
+                logger.info(" >>>>>> ERROR - Test class " + test_class_name + "found in 'Failed' tests")
     test_methods = soup.find_all(id="passedTest")
     if len(test_methods) > 0:
         print(" >>>>> Saving PASSED TESTS ")
         for method in test_methods:
             test_class_name = method.contents[1].get_text().split(".")[1]
             if test_class_name not in test_classes:
-                create_new_test_result(new_build, test_class_name, passed=False)
+                create_new_test_result(new_build, test_class_name, "passed")
+            else:
+                logger.info(" >>>>>> ERROR - Test class " + test_class_name + "found in 'Failed' or 'Skipped' tests")
     html.close()
     os.remove(TARGET_DIR + "\\" + artifact_name)
 
