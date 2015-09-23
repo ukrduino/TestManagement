@@ -1,7 +1,6 @@
 import os
 
 from jenkinsapi.jenkins import Jenkins
-
 from bs4 import BeautifulSoup
 
 from TestCases.models import *
@@ -61,33 +60,44 @@ def process_artifact(new_job, build_number, artifact_name):
     new_build = create_new_build(new_job, build_number)
     html = open(TARGET_DIR + "\\" + artifact_name)
     soup = BeautifulSoup(html, 'html.parser')
-    test_methods = soup.find_all(id="failedTest")
-    test_classes = set()
-    if len(test_methods) > 0:
+    # set to avoid methods be at the same time in 'failed', 'skipped', and 'passed' groups
+    unique_test_classes = set()
+
+    failed_test_methods = soup.find_all(id="failedTest")
+    if len(failed_test_methods) > 0:
         print(" >>>>> Saving FAILED TESTS ")
-        for method in test_methods:
-            test_class_name = method.contents[1].get_text().split(".")[1]
-            create_new_test_result(new_build, test_class_name, "failed")
-            test_classes.add(test_class_name)
-    test_methods = soup.find_all(id="skippedTest")
-    if len(test_methods) > 0:
+        for failed_test_method in failed_test_methods:
+            failed_test_class_name = failed_test_method.contents[1].get_text().split(".")[1]
+            if failed_test_class_name not in unique_test_classes:
+                create_new_test_result(new_build, failed_test_class_name, "failed")
+                unique_test_classes.add(failed_test_class_name)
+            else:
+                logger.info(" >>>>>> TEST RESULTS ERROR - Test class " + failed_test_class_name +
+                            " has more then one failed result in build #" + str(build_number))
+
+
+    skipped_test_methods = soup.find_all(id="skippedTest")
+    if len(skipped_test_methods) > 0:
         print(" >>>>> Saving SKIPPED TESTS ")
-        for method in test_methods:
-            test_class_name = method.contents[1].get_text().split(".")[1]
-            if test_class_name not in test_classes:
-                create_new_test_result(new_build, test_class_name, "skipped")
-                test_classes.add(test_class_name)
-            else:
-                logger.info(" >>>>>> ERROR - Test class " + test_class_name + "found in 'Failed' tests")
-    test_methods = soup.find_all(id="passedTest")
-    if len(test_methods) > 0:
+        for skipped_test_method in skipped_test_methods:
+            skipped_test_class_name = skipped_test_method.contents[1].get_text().split(".")[1]
+            if skipped_test_class_name not in unique_test_classes:
+                create_new_test_result(new_build, skipped_test_class_name, "skipped")
+                unique_test_classes.add(skipped_test_class_name)
+
+
+    passed_test_methods = soup.find_all(id="passedTest")
+    if len(passed_test_methods) > 0:
         print(" >>>>> Saving PASSED TESTS ")
-        for method in test_methods:
-            test_class_name = method.contents[1].get_text().split(".")[1]
-            if test_class_name not in test_classes:
-                create_new_test_result(new_build, test_class_name, "passed")
+        for passed_test_method in passed_test_methods:
+            passed_test_class_name = passed_test_method.contents[1].get_text().split(".")[1]
+            if passed_test_class_name not in unique_test_classes:
+                create_new_test_result(new_build, passed_test_class_name, "passed")
+                unique_test_classes.add(passed_test_class_name)
             else:
-                logger.info(" >>>>>> ERROR - Test class " + test_class_name + "found in 'Failed' or 'Skipped' tests")
+                logger.info(" >>>>>> TEST RESULTS ERROR - Test class " + passed_test_class_name +
+                            " already is in 'failed' or 'skipped' tests in build #" + str(build_number))
+
     html.close()
     os.remove(TARGET_DIR + "\\" + artifact_name)
 

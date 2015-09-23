@@ -9,8 +9,13 @@
                 <thead>
                 <tr>
                     <th class="counter">{{ forloop.counter }}</th>
-                    <th><a href="#" id="job_in_header_link" data-job_id="{{ job_in_header.id }}"
-                           class="job_title_link">{{ job_in_header.job_name }}</a></th>
+                    <th>
+                        <span>{{ job_in_header.job_name }}</span>
+                        &ensp;&ensp;
+                        <button class="job_show_res btn btn-info" data-job_id="{{ job_in_header.id }}">SHOW</button>
+                        &ensp;
+                        <img id="loader{{ job_in_header.id }}" src="{% static 'ajax-loader.gif' %}" height="20px" style="display: none"/>
+                    </th>
                     {% for build in builds %}
                         <th class="build"><a href="#">#{{ build.build_number }}</a></th>
                     {% endfor %}

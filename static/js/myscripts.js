@@ -43,20 +43,20 @@ $('#get_results_from_jenkins').click(function (event) {
 var job_id;
 
 $(function () {
-    $('a[class=job_title_link]').click(function () {
+    $('button:contains("SHOW")').click(function () {
         job_id = $(this).attr("data-job_id");
+        $('img#loader' + job_id).toggle();
         $.ajax({
             url: 'http://127.0.0.1:8000/acceptance_jobs/' + job_id,
-            //url: 'acceptance_jobs/' + job_id,
             type: 'get',
             success: tests_for_job,
             dataType: 'html'
-
         });
     });
 });
 
 function tests_for_job(data) {
     $('#' + job_id).html(data);
+    $('img#loader' + job_id).toggle();
 }
 

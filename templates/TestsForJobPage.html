@@ -3,9 +3,10 @@
         <td class="counter">{{ forloop.counter }}</td>
         <td>{{ test.test_class_name }}</td>
         {% for result in results %}
-            {% if result.test_passed == 'passed' %}<td><span class="glyphicon glyphicon-ok-sign text-success" aria-hidden="true"></span></td>{% endif %}
-            {% if result.test_passed == 'failed' %}<td><span class="glyphicon glyphicon-remove-sign text-danger" aria-hidden="true"></span></td>{% endif %}
-            {% if result.test_passed == 'skipp' %}<td><span class="glyphicon glyphicon-question-sign text-warning" aria-hidden="true"></span></td>{% endif %}
+{#            <td>{{ result.build.id }}</td>#}
+            {% if result.test_passed == 'passed' %}<td><span class="glyphicon glyphicon-ok-sign text-success build" aria-hidden="true"></span></td>{% endif %}
+            {% if result.test_passed == 'failed' %}<td><span class="glyphicon glyphicon-remove-sign text-danger build" aria-hidden="true"></span></td>{% endif %}
+            {% if result.test_passed == 'skipped' %}<td><span class="glyphicon glyphicon-question-sign text-warning build" aria-hidden="true"></span></td>{% endif %}
         {% endfor %}
     </tr>
 {% endfor %}
