@@ -43,7 +43,7 @@ $('#get_results_from_jenkins').click(function (event) {
 var job_id;
 
 $(function () {
-    $('button:contains("SHOW")').click(function () {
+    $('button:contains("LOAD DATA")').click(function () {
         job_id = $(this).attr("data-job_id");
         $('img#loader' + job_id).toggle();
         $.ajax({
@@ -58,5 +58,20 @@ $(function () {
 function tests_for_job(data) {
     $('#' + job_id).html(data);
     $('img#loader' + job_id).toggle();
+    $('button#showButton' + job_id).show();
+    $('button#loadButton' + job_id).hide();
 }
 
+$(function () {
+    $('button:contains("HIDE")').click(function () {
+        if ($(this).text() == "HIDE") {
+            $(this).text("SHOW");
+        }
+        else {
+            $(this).text("HIDE");
+        }
+        ;
+        job_id = $(this).attr("data-job_id");
+        $('#' + job_id).toggle();
+    });
+});

@@ -12,7 +12,9 @@
                     <th>
                         <span>{{ job_in_header.job_name }}</span>
                         &ensp;&ensp;
-                        <button class="job_show_res btn btn-info" data-job_id="{{ job_in_header.id }}">SHOW</button>
+                        <button id="loadButton{{ job_in_header.id }}" class="job_show_res btn btn-info" data-job_id="{{ job_in_header.id }}">LOAD DATA</button>
+                        &ensp;
+                        <button id="showButton{{ job_in_header.id }}" class="hide_res btn btn-warning" data-job_id="{{ job_in_header.id }}" style="display: none">HIDE</button>
                         &ensp;
                         <img id="loader{{ job_in_header.id }}" src="{% static 'ajax-loader.gif' %}" height="20px" style="display: none"/>
                     </th>
