@@ -1,5 +1,4 @@
 from django.shortcuts import render_to_response
-
 from django.template import RequestContext
 
 from TestCases.Parser import JavaTestsParser, JenkinsAPI
@@ -16,10 +15,10 @@ def show_acceptance_jobs(request):
     for job in Job.objects.all():
         jobs_with_builds[job] = JobBuild.objects.filter(job__id=job.id).order_by('build_number')
     args['jobs_with_builds'] = jobs_with_builds
-    return render_to_response("JobsPage.html", args, context_instance=RequestContext(request))
+    return render_to_response("AcceptanceJobsPage.html", args, context_instance=RequestContext(request))
 
 
-def show_test_for_jobs(request, job_id):
+def show_test_for_jobs(request, job_id):  # TODO pass data in ajax dictionary
     args = dict()
     builds = JobBuild.objects.filter(job__id=job_id).order_by('build_number')
     tests_for_job = find_tests_for_job_from_builds(builds)
@@ -109,6 +108,14 @@ def save_instances_to_db(request):
     return render_to_response("HomePage.html", context_instance=RequestContext(request))
 
 
-def get_results_from_jenkins(request):
-    JenkinsAPI.get_results_from_jenkins()
+def get_builds_info_from_jenkins(request):
+    JenkinsAPI.get_acceptance_results_from_jenkins()
     return render_to_response("HomePage.html", context_instance=RequestContext(request))
+
+
+def get_job_configs_from_jenkins(request):
+    JenkinsAPI.add_acceptance_groups_to_jobs()
+    return render_to_response("HomePage.html", context_instance=RequestContext(request))
+
+def show_jobs(request):
+    return render_to_response("JobsPage.html", context_instance=RequestContext(request))

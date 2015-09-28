@@ -3,7 +3,7 @@
         <td class="counter">{{ forloop.counter }}</td>
         <td>{{ test.test_class_name }}</td>
         {% for result in results %}
-{#            <td>{{ result.build.id }}</td>#}
+{#            <td>{{ result.build.id }}</td>#}           {# TODO Add link to TestCase, add show stack trace #}
             {% if result.test_passed == 'passed' %}<td><span class="glyphicon glyphicon-ok-sign text-success build" aria-hidden="true"></span></td>{% endif %}
             {% if result.test_passed == 'failed' %}<td><span class="glyphicon glyphicon-remove-sign text-danger build" aria-hidden="true"></span></td>{% endif %}
             {% if result.test_passed == 'skipped' %}<td><span class="glyphicon glyphicon-question-sign text-warning build" aria-hidden="true"></span></td>{% endif %}

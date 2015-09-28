@@ -1,6 +1,5 @@
 import codecs
 import re
-import os
 
 from TestCases.models import *
 from TestManagement.local_settings import *
@@ -86,15 +85,15 @@ def add_groups_to_test_class(class_header, new_test_class):
             result1 = groups.replace("\"", "").replace(",", "")
             # creating list of groups for this test class
             groups_in_test_list = result1.split()
-            for gr in groups_in_test_list:
+            for grop_name in groups_in_test_list:
                 # saving test group to db if its not saved before
-                if not TestGroup.objects.filter(test_group_name=gr):
-                    print("Saving group - " + gr)
-                    group = TestGroup()
-                    group.test_group_name = gr
-                    group.save()
-            for gr in groups_in_test_list:
-                group = TestGroup.objects.get(test_group_name=gr)
+                if not TestGroup.objects.filter(test_group_name=grop_name):
+                    new_group = TestGroup()
+                    new_group.test_group_name = grop_name
+                    new_group.save()
+                    print("Saved group - " + new_group.test_group_name)
+            for grop_name in groups_in_test_list:
+                group = TestGroup.objects.get(test_group_name=grop_name)
                 new_test_class.test_class_group.add(group)
             print(new_test_class.test_class_group.all())
 

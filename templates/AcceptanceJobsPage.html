@@ -1,0 +1,37 @@
+{% extends 'BasePage.html' %}
+{% load staticfiles %}
+
+{% block acceptance_jobs_page %}
+    <div class="row page_content">
+        {% for job_in_header, builds in jobs_with_builds.items %}
+            <h4></h4>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th class="counter">{{ forloop.counter }}</th>
+                    <th>                                                      {# TODO move 'styles' to css, add link to Build, TestCase #}
+                        <span>{{ job_in_header.job_name }}</span>
+                        &ensp;&ensp;
+                        <button id="loadButton{{ job_in_header.id }}" class="job_show_res btn btn-info"
+                                data-job_id="{{ job_in_header.id }}">LOAD DATA
+                        </button>
+                        &ensp;
+                        <button id="showButton{{ job_in_header.id }}" class="hide_res btn btn-warning"
+                                data-job_id="{{ job_in_header.id }}" style="display: none">HIDE
+                        </button>
+                        &ensp;
+                        <img id="loader{{ job_in_header.id }}" src="{% static 'ajax-loader.gif' %}" height="20px"
+                             style="display: none"/>
+                    </th>
+                    {% for build in builds %}
+                        <th class="build"><p data-toggle="tooltip" data-placement="top" title="28.09.2015"><a href="{{ build.build_link }}">{{ build.build_number }}</a></p><span
+                                class="label label-default">0.260.0</span></th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody id="{{ job_in_header.id }}">
+                </tbody>
+            </table>
+        {% endfor %}
+    </div>
+{% endblock %}

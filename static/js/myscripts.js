@@ -26,10 +26,24 @@ $('#save_instances').click(function (event) {
     });
 });
 
-$('#get_results_from_jenkins').click(function (event) {
+$('#get_builds_info_from_jenkins').click(function (event) {
     event.preventDefault();
     $.ajax({
-        url: 'get_results_from_jenkins/', //TODO use Django Template tags
+        url: 'get_builds_info_from_jenkins/',                       //TODO use Django Template tags if possible
+        type: 'get', //this is the default though, you don't actually need to always mention it
+        success: function (data) {
+            alert("Successfully !!!");
+        },
+        failure: function (data) {
+            alert('Got an error dude');
+        }
+    });                                                             //TODO refactor to parametrized call
+});
+
+$('#get_job_configs_from_jenkins').click(function (event) {
+    event.preventDefault();
+    $.ajax({
+        url: 'get_job_configs_from_jenkins/',                       //TODO use Django Template tags if possible
         type: 'get', //this is the default though, you don't actually need to always mention it
         success: function (data) {
             alert("Successfully !!!");
@@ -42,7 +56,7 @@ $('#get_results_from_jenkins').click(function (event) {
 
 var job_id;
 
-$(function () {
+$(function () {                                                 // TODO pass data in ajax dictionary
     $('button:contains("LOAD DATA")').click(function () {
         job_id = $(this).attr("data-job_id");
         $('img#loader' + job_id).toggle();

@@ -3,29 +3,6 @@
 
 {% block jobs_page %}
     <div class="row page_content">
-        {% for job_in_header, builds in jobs_with_builds.items %}
-            <h4></h4>
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th class="counter">{{ forloop.counter }}</th>
-                    <th>
-                        <span>{{ job_in_header.job_name }}</span>
-                        &ensp;&ensp;
-                        <button id="loadButton{{ job_in_header.id }}" class="job_show_res btn btn-info" data-job_id="{{ job_in_header.id }}">LOAD DATA</button>
-                        &ensp;
-                        <button id="showButton{{ job_in_header.id }}" class="hide_res btn btn-warning" data-job_id="{{ job_in_header.id }}" style="display: none">HIDE</button>
-                        &ensp;
-                        <img id="loader{{ job_in_header.id }}" src="{% static 'ajax-loader.gif' %}" height="20px" style="display: none"/>
-                    </th>
-                    {% for build in builds %}
-                        <th class="build"><a href="#">#{{ build.build_number }}</a></th>
-                    {% endfor %}
-                </tr>
-                </thead>
-                <tbody id="{{ job_in_header.id }}">
-                </tbody>
-            </table>
-        {% endfor %}
+
     </div>
 {% endblock %}
