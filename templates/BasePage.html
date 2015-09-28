@@ -27,10 +27,10 @@
             <li><a href="{% url 'home' %}">Home</a></li>
             <li><a href="{% url 'show_acceptance_jobs' %}">Acceptance</a></li>
             <li><a href="{% url 'show_all_test_cases' %}">Test Cases</a></li>
-            <li><a href="{% url 'show_jobs' %}">Jobs</a></li>
+            <li><a href="{% url 'search_jobs' %}">Search jobs</a></li>
             <li><a href="#">Statistics</a></li>
         </ul>
-        {% block jobs_page %}{% endblock %}
+        {% block search_jobs_page %}{% endblock %}
         {% block acceptance_jobs_page %}{% endblock %}
         {% block home_page %}{% endblock %}
         {% block test_cases_page %}{% endblock %}

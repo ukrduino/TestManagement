@@ -18,24 +18,23 @@ def show_acceptance_jobs(request):
     return render_to_response("AcceptanceJobsPage.html", args, context_instance=RequestContext(request))
 
 
-def show_test_for_jobs(request, job_id):  # TODO pass data in ajax dictionary
+def show_test_for_jobs(request):  # TODO pass data in ajax dictionary
     args = dict()
-    builds = JobBuild.objects.filter(job__id=job_id).order_by('build_number')
-    tests_for_job = find_tests_for_job_from_builds(builds)
-    tests_with_results = dict()
-    for test in tests_for_job:
-        results_for_test = list()
-        for build in builds:
-            result = TestResult.objects.filter(build__id=build.id)
-            for res in result:
-                if res.test_class.id == test.id:
-                    results_for_test.append(res)
-        tests_with_results[test] = results_for_test
-    for t, r in tests_with_results.items():
-        print(t)
-        print(r)
-    args['tests_with_results'] = tests_with_results
-    return render_to_response("TestsForJobPage.html", args, context_instance=RequestContext(request))
+    if request.method == 'POST':
+        job_id = request.POST['job_id']
+        builds = JobBuild.objects.filter(job__id=job_id).order_by('build_number')
+        tests_for_job = find_tests_for_job_from_builds(builds)
+        tests_with_results = dict()
+        for test in tests_for_job:
+            results_for_test = list()
+            for build in builds:
+                result = TestResult.objects.filter(build__id=build.id)
+                for res in result:
+                    if res.test_class.id == test.id:
+                        results_for_test.append(res)
+            tests_with_results[test] = results_for_test
+        args['tests_with_results'] = tests_with_results
+    return render_to_response("TestsForAcceptanceJobsPage.html", args, context_instance=RequestContext(request))
 
 
 def find_tests_for_job_from_builds(builds):
@@ -117,5 +116,20 @@ def get_job_configs_from_jenkins(request):
     JenkinsAPI.add_acceptance_groups_to_jobs()
     return render_to_response("HomePage.html", context_instance=RequestContext(request))
 
-def show_jobs(request):
+
+def search_jobs_page(request):
     return render_to_response("JobsPage.html", context_instance=RequestContext(request))
+
+
+def search_jobs_by_groups(request):
+    args = dict()
+    jobs_set = set()
+    if request.method == 'POST':
+        group_names = request.POST['search_text']
+        group_names_list = group_names.replace(" ", "").split(",")
+        if len(group_names_list) > 0:
+            for group_name in group_names_list:
+                jobs = Job.objects.filter(testgroup__test_group_name=group_name)
+                jobs_set.update(jobs)
+            args['found_jobs_list'] = list(jobs_set)
+    return render_to_response("JobsForJobsPage.html", args, context_instance=RequestContext(request))

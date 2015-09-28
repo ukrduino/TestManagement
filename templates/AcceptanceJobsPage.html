@@ -7,6 +7,7 @@
             <h4></h4>
             <table class="table table-bordered">
                 <thead>
+                {% csrf_token %}
                 <tr>
                     <th class="counter">{{ forloop.counter }}</th>
                     <th>                                                      {# TODO move 'styles' to css, add link to Build, TestCase #}

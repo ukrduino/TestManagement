@@ -56,13 +56,17 @@ $('#get_job_configs_from_jenkins').click(function (event) {
 
 var job_id;
 
-$(function () {                                                 // TODO pass data in ajax dictionary
+$(function () {
     $('button:contains("LOAD DATA")').click(function () {
         job_id = $(this).attr("data-job_id");
         $('img#loader' + job_id).toggle();
         $.ajax({
-            url: 'http://127.0.0.1:8000/acceptance_jobs/' + job_id,
-            type: 'get',
+            type: 'POST',
+            url: 'load_data/',                       //TODO use Django Template tags if possible
+            data: {
+                'job_id' : job_id,
+                'csrfmiddlewaretoken' : $('input[name=csrfmiddlewaretoken]').val()
+            },
             success: tests_for_job,
             dataType: 'html'
         });
@@ -89,3 +93,20 @@ $(function () {
         $('#' + job_id).toggle();
     });
 });
+
+$('#job_search_input').keyup(function () {
+    $.ajax({
+        type: 'POST',
+        url: 'by_groups/',                       //TODO use Django Template tags if possible
+        data: {
+            'search_text' : $('#job_search_input').val(),
+            'csrfmiddlewaretoken' : $('input[name=csrfmiddlewaretoken]').val()
+        },
+        success: search_Successful,
+        dataType: 'html'
+    });
+});
+
+function search_Successful(data) {
+    $('#found_jobs_list_in_template').html(data);
+}

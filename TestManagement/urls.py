@@ -8,8 +8,9 @@ urlpatterns = [
     url(r'^get_builds_info_from_jenkins/$', 'TestCases.views.get_builds_info_from_jenkins', name="get_builds_info_from_jenkins"),
     url(r'^get_job_configs_from_jenkins/$', 'TestCases.views.get_job_configs_from_jenkins', name="get_job_configs_from_jenkins"),
     url(r'^acceptance_jobs/$', 'TestCases.views.show_acceptance_jobs', name="show_acceptance_jobs"),
-    url(r'^jobs/$', 'TestCases.views.show_jobs', name="show_jobs"),
-    url(r'^acceptance_jobs/(?P<job_id>\d+)$', 'TestCases.views.show_test_for_jobs', name="show_test_for_jobs"),  # TODO pass data in ajax dictionary
+    url(r'^acceptance_jobs/load_data/$', 'TestCases.views.show_test_for_jobs', name="load_data"),  # TODO pass data in ajax dictionary
+    url(r'^search_jobs/$', 'TestCases.views.search_jobs_page', name="search_jobs"),
+    url(r'^search_jobs/by_groups/$', 'TestCases.views.search_jobs_by_groups', name="search_jobs_by_groups"),
     url(r'^all_test_cases/$', 'TestCases.views.show_all_test_cases', name="show_all_test_cases"),
     url(r'^$', 'TestCases.views.home', name="home"),
     url(r'^admin/', include(admin.site.urls)),
