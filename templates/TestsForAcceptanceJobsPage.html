@@ -2,11 +2,10 @@
     <tr>
         <td class="counter">{{ forloop.counter }}</td>
         <td>
+            {# TODO Add link to TestCase #}
             <a href="{{ test. }}" target=_blank>{{ test.test_class_name }}</a>
         </td>
         {% for result in results %}
-            {#            <td>{{ result.build.id }}</td>#}
-            {# TODO Add link to TestCase, add show stack trace #}
             {% if result.test_passed == 'passed' %}
                 <td>
                     <span class="glyphicon glyphicon-ok-sign text-success build" aria-hidden="true"></span>

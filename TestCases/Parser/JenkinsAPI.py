@@ -2,6 +2,7 @@ import re
 
 from jenkinsapi.jenkins import Jenkins
 from bs4 import BeautifulSoup
+
 from selenium import webdriver
 import untangle
 
@@ -17,11 +18,11 @@ def get_server_instance():
     return server
 
 
-def get_acceptance_results_from_jenkins():
+def get_acceptance_builds_info_from_jenkins():
     get_results_from_jenkins(ACCEPTANCE_URL, EXCLUDED_ACCEPTANCE_JOBS, True)
 
 
-def get_trunk_results_from_jenkins():
+def get_trunk_builds_info_from_jenkins():
     get_results_from_jenkins(TRUNK_URL, EXCLUDED_TRUNK_JOBS, False)
 
 
@@ -127,11 +128,11 @@ def process_artifact(new_job, build_number, build_link, build_date, build_run_ti
     os.remove(BUILD_RESULTS_FILE_PATH)
 
 
-def add_acceptance_groups_to_jobs():
+def get_acceptance_job_configs_from_jenkins():
     add_groups_to_jobs(ACCEPTANCE_URL, EXCLUDED_ACCEPTANCE_JOBS)
 
 
-def add_trunk_groups_to_jobs():
+def get_trunk_job_configs_from_jenkins():
     add_groups_to_jobs(TRUNK_URL, EXCLUDED_TRUNK_JOBS)
 
 

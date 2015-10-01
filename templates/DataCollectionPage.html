@@ -1,0 +1,66 @@
+{% extends 'BasePage.html' %}
+{% load staticfiles %}
+
+
+{% block data_collection_page %}
+    <div class="row page_content">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title" style="text-align: center">START ACTIONS</h3>
+            </div>
+            <div class="panel-body">
+                <div class="btn-group btn-group-justified" role="group" aria-label="">
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-default" id="parse_java">Parse java code</a>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-default" id="save_instances">Save instances to DB</a>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default">..........</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title" style="text-align: center">ACCEPTANCE</h3>
+            </div>
+            <div class="panel-body">
+                <div class="btn-group btn-group-justified" role="group" aria-label="">
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-default" id="get_acceptance_builds_info_from_jenkins">Get builds info from
+                            Jenkins</a>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-default" id="get_acceptance_job_configs_from_jenkins">Get jobs configs from
+                            Jenkins</a>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default">...........</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title" style="text-align: center">TRUNK</h3>
+            </div>
+            <div class="panel-body">
+                <div class="btn-group btn-group-justified" role="group" aria-label="">
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-default" id="get_trunk_builds_info_from_jenkins">Get builds info from
+                            Jenkins</a>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-default" id="get_trunk_job_configs_from_jenkins">Get jobs configs from
+                            Jenkins</a>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default">...........</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

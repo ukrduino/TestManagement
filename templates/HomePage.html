@@ -23,7 +23,8 @@
                     0
                 {% endif %}
             </a>
-            test methods (selenium auto-tests)</p>
+            test methods (selenium auto-tests
+        </p>
 
         <p>These tests are run in
             <a href="#" class="home_page_big_numbers">
@@ -33,8 +34,8 @@
                     0
                 {% endif %}
             </a>
-            Jenkins jobs</p>
-
+            Jenkins jobs
+        </p>
         <p>We have actual data about last 5 build for each job in
             <a href="#" class="home_page_big_numbers">
                 {% if builds_number > 0 %}
@@ -42,22 +43,8 @@
                 {% else %}
                     0
                 {% endif %}
-            </a>
-            build reports</p>
-
+            </a> build reports</p>
         <p>To retrieve actual data about tests/groups/builds/jobs you have to press "Update" button</p>
-
         <p>Process will take approx. 20 minutes you will be notified with "Successful" pop up.</p>
-
-
-        <p class="jumbotron_button">
-            <a class="btn btn-primary btn" id="parse_java">Parse java code</a>
-            <span class="glyphicon glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
-            <a class="btn btn-primary btn" id="save_instances">Save instances to DB</a>
-            <span class="glyphicon glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
-            <a class="btn btn-primary btn" id="get_builds_info_from_jenkins">Get builds info from Jenkins</a>
-            <span class="glyphicon glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
-            <a class="btn btn-primary btn" id="get_job_configs_from_jenkins">Get jobs configs from Jenkins</a>
-        </p>
     </div>
 {% endblock %}

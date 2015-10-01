@@ -1,4 +1,5 @@
 // HOME PAGE BUTTONS
+// START ACTIONS
 $('#parse_java').click(function (event) {
     event.preventDefault();
     $.ajax({
@@ -21,21 +22,45 @@ $('#save_instances').click(function (event) {
     });
 });
 
-$('#get_builds_info_from_jenkins').click(function (event) {
+// ACCEPTANCE ACTIONS
+$('#get_acceptance_builds_info_from_jenkins').click(function (event) {
     event.preventDefault();
     $.ajax({
-        url: 'get_builds_info_from_jenkins/',                       //TODO use Django Template tags if possible
+        url: 'get_acceptance_builds_info_from_jenkins/',
         type: 'get', //this is the default though, you don't actually need to always mention it
         success: function () {
             alert("Successfully !!!");
         }
-    });                                                             //TODO refactor to parametrized call
+    });
 });
 
-$('#get_job_configs_from_jenkins').click(function (event) {
+$('#get_acceptance_job_configs_from_jenkins').click(function (event) {
     event.preventDefault();
     $.ajax({
-        url: 'get_job_configs_from_jenkins/',                       //TODO use Django Template tags if possible
+        url: 'get_acceptance_job_configs_from_jenkins/',
+        type: 'get', //this is the default though, you don't actually need to always mention it
+        success: function () {
+            alert("Successfully !!!");
+        }
+    });
+});
+
+// TRUNK ACTIONS
+$('#get_trunk_builds_info_from_jenkins').click(function (event) {
+    event.preventDefault();
+    $.ajax({
+        url: 'get_trunk_builds_info_from_jenkins/',
+        type: 'get', //this is the default though, you don't actually need to always mention it
+        success: function () {
+            alert("Successfully !!!");
+        }
+    });
+});
+
+$('#get_trunk_job_configs_from_jenkins').click(function (event) {
+    event.preventDefault();
+    $.ajax({
+        url: 'get_trunk_job_configs_from_jenkins/',
         type: 'get', //this is the default though, you don't actually need to always mention it
         success: function () {
             alert("Successfully !!!");

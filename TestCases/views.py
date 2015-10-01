@@ -7,9 +7,8 @@ from TestCases.models import *
 logger = logging.getLogger(__name__)
 
 
-# Site section
+# ACCEPTANCE PAGE
 def show_acceptance_jobs(request):
-
     args = dict()
     jobs_with_builds = dict()
     for job in Job.objects.all():
@@ -18,7 +17,7 @@ def show_acceptance_jobs(request):
     return render_to_response("AcceptanceJobsPage.html", args, context_instance=RequestContext(request))
 
 
-def show_test_for_jobs(request):  # TODO pass data in ajax dictionary
+def show_test_for_jobs(request):
     args = dict()
     if request.method == 'POST':
         job_id = request.POST['job_id']
@@ -45,33 +44,6 @@ def find_tests_for_job_from_builds(builds):
             test = TestClass.objects.get(id=result.test_class.id)
             tests_for_job.add(test)
     return tests_for_job
-
-    # jobs_with_groups_tests_results = dict()
-    # for jenkins_job in Job.objects.all():
-    #     build_with_tests = dict()
-    #     for buid in JobBuild.objects.filter(job__id=jenkins_job.id):
-    #         tests_with_results = dict()
-    #         for test in TestClass.objects.filter(test_case_group__id=group.id):
-    #             results = TestResult.objects.filter(test_case__id=test.id)
-    #             results_for_template = list()
-    #             for build in jobs_with_builds[jenkins_job]:
-    #                 not_run = True
-    #                 for res in results:
-    #                     if build.id == res.build.id:
-    #                         if res.test_passed:
-    #                             results_for_template.append("pass")
-    #                             not_run = False
-    #                             break
-    #                         else:
-    #                             results_for_template.append("fail")
-    #                             not_run = False
-    #                             break
-    #                 if not_run:
-    #                     results_for_template.append("N/R")
-    #             tests_with_results[test] = results_for_template
-    #         groups_with_tests[group] = tests_with_results
-    #     jobs_with_groups_tests_results[jenkins_job] = groups_with_tests
-    # args['jobs_with_groups_tests_results'] = jobs_with_groups_tests_results
 
 
 def show_all_test_cases(request):
@@ -107,13 +79,23 @@ def save_instances_to_db(request):
     return render_to_response("HomePage.html", context_instance=RequestContext(request))
 
 
-def get_builds_info_from_jenkins(request):
-    JenkinsAPI.get_acceptance_results_from_jenkins()
+def get_acceptance_builds_info_from_jenkins(request):
+    JenkinsAPI.get_acceptance_builds_info_from_jenkins()
     return render_to_response("HomePage.html", context_instance=RequestContext(request))
 
 
-def get_job_configs_from_jenkins(request):
-    JenkinsAPI.add_acceptance_groups_to_jobs()
+def get_acceptance_job_configs_from_jenkins(request):
+    JenkinsAPI.get_acceptance_job_configs_from_jenkins()
+    return render_to_response("HomePage.html", context_instance=RequestContext(request))
+
+
+def get_trunk_builds_info_from_jenkins(request):
+    JenkinsAPI.get_trunk_builds_info_from_jenkins()
+    return render_to_response("HomePage.html", context_instance=RequestContext(request))
+
+
+def get_trunk_job_configs_from_jenkins(request):
+    JenkinsAPI.get_trunk_job_configs_from_jenkins()
     return render_to_response("HomePage.html", context_instance=RequestContext(request))
 
 
@@ -133,3 +115,7 @@ def search_jobs_by_groups(request):
                 jobs_set.update(jobs)
             args['found_jobs_list'] = list(jobs_set)
     return render_to_response("JobsForJobsPage.html", args, context_instance=RequestContext(request))
+
+
+def data_collection_page(request):
+    return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
