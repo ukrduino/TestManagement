@@ -18,15 +18,23 @@
                         </button>
                         &ensp;
                         <button id="showButton{{ job_in_header.id }}" class="hide_res btn btn-warning"
-                                data-job_id="{{ job_in_header.id }}" style="display: none">HIDE
+                                data-job_id="{{ job_in_header.id }}" style="display: none">HIDE/SHOW
                         </button>
                         &ensp;
                         <img id="loader{{ job_in_header.id }}" src="{% static 'ajax-loader.gif' %}" height="20px"
                              style="display: none"/>
                     </th>
                     {% for build in builds %}
-                        <th class="build"><p data-toggle="tooltip" data-placement="top" title="28.09.2015"><a href="{{ build.build_link }}">{{ build.build_number }}</a></p><span
-                                class="label label-default">0.260.0</span></th>
+                        <th class="build">
+                            <p data-toggle="tooltip" data-placement="top" title={{ build.build_date }}>
+                                {% if build.build_successful %}
+                                    <a class="text-success" href="{{ build.build_link }} target=_blank">{{ build.build_number }}</a>
+                                {% else %}
+                                    <a class="text-danger" href="{{ build.build_link }} target=_blank">{{ build.build_number }}</a>
+                                {% endif %}
+                            </p>
+                            <span class="label label-default">{{ build.build_app_ver }}</span>
+                        </th>
                     {% endfor %}
                 </tr>
                 </thead>
@@ -35,4 +43,18 @@
             </table>
         {% endfor %}
     </div>
+     <!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Stack trace</h4>
+      </div>
+      <div class="modal-body container-fluid stack_trace" style="overflow: scroll;"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

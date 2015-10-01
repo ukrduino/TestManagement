@@ -1,6 +1,6 @@
 {% if found_jobs_list|length %}
     {% for job in found_jobs_list %}
-        <li class="list-group-item"><a href="{{ job.job_link }}">{{ job.job_name }}</a></li>
+        <li class="list-group-item"><a href="{{ job.job_link }}" target=_blank>{{ job.job_name }}</a></li>
     {% endfor %}
 {% else %}
     <li class="list-group-item">No jobs found</li>

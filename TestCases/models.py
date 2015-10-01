@@ -44,11 +44,11 @@ class JobBuild(models.Model):
 
     job = models.ForeignKey(Job)
     build_number = models.IntegerField(verbose_name="Number of build")
-    build_app_ver = models.CharField(verbose_name="Version of App", max_length=200, blank=True)  # TODO Get from Report
-    build_date = models.DateTimeField(verbose_name="Date of build", null=True)  # TODO set build date and time (From Report)
+    build_app_ver = models.CharField(verbose_name="Version of App", max_length=200, blank=True)
+    build_date = models.CharField(verbose_name="Date of build", max_length=200, blank=True)
     build_link = models.CharField(verbose_name="Build link", max_length=200, blank=True)
-    build_run_time = models.CharField(verbose_name="Build run time", max_length=200, blank=True)  # TODO Get from Report
-    build_successful = models.BooleanField(verbose_name="Was build successful", default=False)  # TODO Get from Report or calculate
+    build_run_time = models.CharField(verbose_name="Build run time", max_length=200, blank=True)
+    build_successful = models.BooleanField(verbose_name="Was build successful", default=False)
 
     def __str__(self):
         return "Build #" + str(self.build_number) + " of " + self.job.job_name
@@ -57,9 +57,13 @@ class JobBuild(models.Model):
         return "Build #" + str(self.build_number) + " of " + self.job.job_name
 
 
-def create_new_build(new_job, build_number, build_link):  # TODO move to class constructor
+def create_new_build(new_job, build_number, build_link, build_date, build_run_time):  # TODO move to class constructor
     # creating new build
-    new_build = JobBuild(job=new_job, build_number=build_number, build_link=build_link)
+    new_build = JobBuild(job=new_job,
+                         build_number=build_number,
+                         build_link=build_link,
+                         build_date=build_date,
+                         build_run_time=build_run_time)
     new_build.save()
     print(" >>>> Saved new build #" + str(new_build.build_number) + " for >>> " + new_build.job.job_name)
     return new_build
@@ -129,7 +133,7 @@ class TestResult(models.Model):
     test_passed = models.CharField(verbose_name="Test passed", max_length=10)
     build = models.ForeignKey(JobBuild)
     test_class = models.ForeignKey(TestClass)
-    test_stack_trace = models.TextField(verbose_name="Stack Trace", blank=True)  # TODO set stack trace (From Report)
+    test_stack_trace = models.TextField(verbose_name="Stack Trace", blank=True)
 
     def __str__(self):
         return "TestResult #" + str(self.id)
@@ -138,19 +142,27 @@ class TestResult(models.Model):
         return "TestResult #" + str(self.id)
 
 
-def create_new_test_result(build, test_class_name, passed):  # TODO move to class constructor
-    test_classes = TestClass.objects.filter(test_class_name__contains=test_class_name)
-    if len(test_classes) == 1:
-        new_test_result = TestResult(test_class=test_classes[0], build=build, test_passed=passed)
-        new_test_result.save()
-        print(" >>>>>> Saved TestResult#" + str(new_test_result.id) + " for " + test_classes[0].test_class_name)
-    elif len(test_classes) == 0:
-        logger.info(" >>>>>> ERROR - No test class with name " + test_class_name + "found in DB")
-    elif len(test_classes) > 1:
-        logger.info(" >>>>>> ERROR - 2 or more test class with name " + test_class_name + "found in DB")
-        for test in test_classes:
-            logger.info(str(test.id) + test.test_class_name)
-        logger.info(" >>>>>> Result not saved")
+def create_new_test_result(build, test_class_name_from_report, passed, failed_test_class_stack_trace):  # TODO move to class constructor
+    test_classes_from_db = TestClass.objects.filter(test_class_name__contains=test_class_name_from_report)
+    if len(test_classes_from_db) > 0:
+        for test_class_obj in test_classes_from_db:
+            if test_class_name_from_report == test_class_obj.test_class_name[:-1]:  # removing unknown symbol at the end
+                new_test_result = TestResult(test_class=test_class_obj,
+                                             build=build,
+                                             test_passed=passed,
+                                             test_stack_trace=failed_test_class_stack_trace)
+                new_test_result.save()
+                print("Saved TestResult #" + str(new_test_result.id) + " for " + test_class_obj.test_class_name)
+    elif len(test_classes_from_db) > 1:
+        logger.info("TEST CLASS DUPLICATION - 2 or more test class with name (or similar name)" +
+                    test_class_name_from_report + " found in DB (Build id #" + str(build.id) + ")")
+        for test_class_from_db in test_classes_from_db:
+            logger.info("Found - test class id(" + str(test_class_from_db.id) + ") test class name(" +
+                        test_class_from_db.test_class_name + ")")
+    else:
+        logger.info("TEST CLASS ABSENT - No test class with name " + test_class_name_from_report +
+                    " found in DB (Build id #" + str(build.id) + ")")
+        logger.info("Result not saved")
 
 # Making migrations
 # http://stackoverflow.com/a/29898483

@@ -41,7 +41,7 @@ def create_instances_and_put_to_db():
         # creating new instance of TestClass
         new_test_class = TestClass()
         # searching test class name in class headers
-        test_class_name_search_result = re.findall("void (.+?)\\n", class_header)
+        test_class_name_search_result = re.findall("public void (.+?)\\n", class_header)  # TODO Some shit at the end of class name
         for name in test_class_name_search_result:
             new_test_class.test_class_name = name.replace(" ", "").replace('\n', '').replace('\t', ' ')
             print(">>>>> Test class name - " + new_test_class.test_class_name)

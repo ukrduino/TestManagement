@@ -1,13 +1,11 @@
+// HOME PAGE BUTTONS
 $('#parse_java').click(function (event) {
     event.preventDefault();
     $.ajax({
         url: 'parse_java_code/',
         type: 'get', //this is the default though, you don't actually need to always mention it
-        success: function (data) {
+        success: function () {
             alert("Successfully !!!");
-        },
-        failure: function (data) {
-            alert('Got an error dude');
         }
     });
 });
@@ -17,11 +15,8 @@ $('#save_instances').click(function (event) {
     $.ajax({
         url: 'save_instances/',
         type: 'get', //this is the default though, you don't actually need to always mention it
-        success: function (data) {
+        success: function () {
             alert("Successfully !!!");
-        },
-        failure: function (data) {
-            alert('Got an error dude');
         }
     });
 });
@@ -31,11 +26,8 @@ $('#get_builds_info_from_jenkins').click(function (event) {
     $.ajax({
         url: 'get_builds_info_from_jenkins/',                       //TODO use Django Template tags if possible
         type: 'get', //this is the default though, you don't actually need to always mention it
-        success: function (data) {
+        success: function () {
             alert("Successfully !!!");
-        },
-        failure: function (data) {
-            alert('Got an error dude');
         }
     });                                                             //TODO refactor to parametrized call
 });
@@ -45,17 +37,14 @@ $('#get_job_configs_from_jenkins').click(function (event) {
     $.ajax({
         url: 'get_job_configs_from_jenkins/',                       //TODO use Django Template tags if possible
         type: 'get', //this is the default though, you don't actually need to always mention it
-        success: function (data) {
+        success: function () {
             alert("Successfully !!!");
-        },
-        failure: function (data) {
-            alert('Got an error dude');
         }
     });
 });
 
+// ACCEPTANCE PAGE BUTTONS
 var job_id;
-
 $(function () {
     $('button:contains("LOAD DATA")').click(function () {
         job_id = $(this).attr("data-job_id");
@@ -80,20 +69,19 @@ function tests_for_job(data) {
     $('button#loadButton' + job_id).hide();
 }
 
+$('#myModal').on('show.bs.modal', function (e) {
+    var stack_trace = $(e.relatedTarget).data('stack');
+    $(e.currentTarget).find('div.stack_trace').text(stack_trace)
+});
+
 $(function () {
-    $('button:contains("HIDE")').click(function () {
-        if ($(this).text() == "HIDE") {
-            $(this).text("SHOW");
-        }
-        else {
-            $(this).text("HIDE");
-        }
-        ;
+    $('button:contains("HIDE/SHOW")').click(function () {
         job_id = $(this).attr("data-job_id");
         $('#' + job_id).toggle();
     });
 });
 
+// SEARCH JOB PAGE BUTTON
 $('#job_search_input').keyup(function () {
     $.ajax({
         type: 'POST',

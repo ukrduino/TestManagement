@@ -1,4 +1,4 @@
-import logging
+import re
 
 from jenkinsapi.jenkins import Jenkins
 from bs4 import BeautifulSoup
@@ -51,12 +51,14 @@ def get_results_from_jenkins(view_url, excluded_jobs, is_acceptance):
 
 def process_build_data(job_inst, new_job, build_number, build_link):
     build_inst = job_inst.get_build(build_number)
+    build_run_time = str(build_inst.get_duration()).split('.')[0]
+    build_date = build_inst.get_timestamp().strftime('%d.%m.%Y %H:%M')
     # filtering builds that have artifacts
     artifacts = build_inst.get_artifact_dict()
     for artifact_name, artifact in artifacts.items():
         if artifact_name == BUILD_RESULTS:
             save_artifact(artifact)
-            process_artifact(new_job, build_number, build_link)
+            process_artifact(new_job, build_number, build_link, build_date, build_run_time)
 
 
 def save_artifact(artifact):
@@ -65,22 +67,28 @@ def save_artifact(artifact):
     artifact.save_to_dir(TARGET_DIR)
 
 
-def process_artifact(new_job, build_number, build_link):
+def process_artifact(new_job, build_number, build_link, build_date, build_run_time):
     # creating new build with link to QA_Team_Report
-    new_build = create_new_build(new_job, build_number, build_link + BUILD_RESULTS_REPORT_LINK)
+    new_build = create_new_build(new_job,
+                                 build_number,
+                                 build_link + BUILD_RESULTS_REPORT_LINK,
+                                 build_date,
+                                 build_run_time)
     html_report_file = open(BUILD_RESULTS_FILE_PATH)
     html_report_soup = BeautifulSoup(html_report_file, 'html.parser')
-    # set to avoid methods be at the same time in 'failed', 'skipped', and 'passed' groups
-    unique_test_classes = set()
-
+    # unique_test_classes_set used to avoid methods be at the same time in 'failed', 'skipped', and 'passed' groups
+    unique_test_classes_set = set()
     failed_test_methods = html_report_soup.find_all(id="failedTest")
+    successful_build = True
     if len(failed_test_methods) > 0:
         print(" >>>>> Saving FAILED TESTS ")
+        successful_build = False
         for failed_test_method in failed_test_methods:
             failed_test_class_name = failed_test_method.contents[1].get_text().split(".")[1]
-            if failed_test_class_name not in unique_test_classes:
-                create_new_test_result(new_build, failed_test_class_name, "failed")
-                unique_test_classes.add(failed_test_class_name)
+            failed_test_class_stack_trace = failed_test_method.find('textarea').getText()
+            if failed_test_class_name not in unique_test_classes_set:
+                create_new_test_result(new_build, failed_test_class_name, "failed", failed_test_class_stack_trace)
+                unique_test_classes_set.add(failed_test_class_name)
             else:
                 logger.info(" >>>>>> TEST RESULTS ERROR - Test class " + failed_test_class_name +
                             " has more then one failed result in build #" + str(build_number))
@@ -88,24 +96,33 @@ def process_artifact(new_job, build_number, build_link):
     skipped_test_methods = html_report_soup.find_all(id="skippedTest")
     if len(skipped_test_methods) > 0:
         print(" >>>>> Saving SKIPPED TESTS ")
+        successful_build = False
         for skipped_test_method in skipped_test_methods:
             skipped_test_class_name = skipped_test_method.contents[1].get_text().split(".")[1]
-            if skipped_test_class_name not in unique_test_classes:
-                create_new_test_result(new_build, skipped_test_class_name, "skipped")
-                unique_test_classes.add(skipped_test_class_name)
+            if skipped_test_class_name not in unique_test_classes_set:
+                create_new_test_result(new_build, skipped_test_class_name, "skipped", "")
+                unique_test_classes_set.add(skipped_test_class_name)
 
     passed_test_methods = html_report_soup.find_all(id="passedTest")
     if len(passed_test_methods) > 0:
         print(" >>>>> Saving PASSED TESTS ")
         for passed_test_method in passed_test_methods:
             passed_test_class_name = passed_test_method.contents[1].get_text().split(".")[1]
-            if passed_test_class_name not in unique_test_classes:
-                create_new_test_result(new_build, passed_test_class_name, "passed")
-                unique_test_classes.add(passed_test_class_name)
+            if passed_test_class_name not in unique_test_classes_set:
+                create_new_test_result(new_build, passed_test_class_name, "passed", "")
+                unique_test_classes_set.add(passed_test_class_name)
             else:
                 logger.info(" >>>>>> TEST RESULTS ERROR - Test class " + passed_test_class_name +
                             " already is in 'failed' or 'skipped' tests in build #" + str(build_number))
-
+    # saving successful_build if its successful
+    if successful_build and len(unique_test_classes_set) > 0:
+        new_build.build_successful = True
+    pre_text = html_report_soup.find('pre').getText().replace("\n", "")
+    # saving app_version
+    app_version_search_result = re.findall("Application Version : (.+?)Locale", pre_text)
+    for app_version in app_version_search_result:
+        new_build.build_app_ver = app_version.split()[0][2:]
+    new_build.save()
     html_report_file.close()
     os.remove(BUILD_RESULTS_FILE_PATH)
 
@@ -134,8 +151,8 @@ def add_groups_to_jobs(view_url, excluded_jobs):
         # getting xml data for job
         driver.get(config_link)
         config_xml = driver.page_source
-        groups_list = get_groups_list_from_job_config(config_xml)
-        #adding groups to job
+        groups_list = get_groups_list_from_job_config(job_name, config_xml)
+        # adding groups to job
         job_from_db = Job.objects.get(job_name=job_name)
         print(job_from_db.job_name)
         for group_name in groups_list:
@@ -164,12 +181,11 @@ def get_jenkins_jobs_configs_links_dict(view_url, excluded_jobs):
     return config_links_dict
 
 
-def get_groups_list_from_job_config(config_xml):
+def get_groups_list_from_job_config(job_name, config_xml):
     groups_data = ""
     config_dict = untangle.parse(config_xml)
-    try:
-        groups_data = config_dict.project.builders.EnvInjectBuilder.info.propertiesContent.cdata
-        if groups_data.startswith("TEST_GROUPS="):
-            return groups_data.replace("TEST_GROUPS=", "").split(",")
-    except:
-        print("Can't get group from - " + groups_data)
+    groups_data = config_dict.project.builders.EnvInjectBuilder.info.propertiesContent.cdata
+    if groups_data.startswith("TEST_GROUPS="):
+        return groups_data.replace("TEST_GROUPS=", "").split(",")
+    else:
+        logger.info("TEST_GROUPS ABSENT IN JOB CONFIGS - (" + groups_data + ") for job (" + job_name + ")")
