@@ -10,19 +10,16 @@
                 {% csrf_token %}
                 <tr>
                     <th class="counter">{{ forloop.counter }}</th>
-                    <th>                                                      {# TODO move 'styles' to css, add link to Build, TestCase #}
-                        <span>{{ job_in_header.job_name }}</span>
-                        &ensp;&ensp;
+                    <th> {# TODO move 'styles' to css, add link to Build, TestCase #}
+                        <span style="padding-right:30px">{{ job_in_header.job_name }}</span>
                         <button id="loadButton{{ job_in_header.id }}" class="job_show_res btn btn-info"
                                 data-job_id="{{ job_in_header.id }}">LOAD DATA
                         </button>
-                        &ensp;
                         <button id="showButton{{ job_in_header.id }}" class="hide_res btn btn-warning"
                                 data-job_id="{{ job_in_header.id }}" style="display: none">HIDE/SHOW
                         </button>
-                        &ensp;
                         <img id="loader{{ job_in_header.id }}" src="{% static 'ajax-loader.gif' %}" height="20px"
-                             style="display: none"/>
+                             style="display: none; padding-left:10px"/>
                     </th>
                     {% for build in builds %}
                         <th class="build">
