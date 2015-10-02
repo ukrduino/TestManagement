@@ -1,0 +1,50 @@
+{% for job in jobs %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><a href="{{ job.job_link }}" target="_blank">
+                {{ forloop.counter }}{{ job.job_name }}</a></h3>
+        </div>
+        <div class="panel-body">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th style="width: 20%">Job config parameter</th>
+                    <th style="width: 80%">Parameter value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>job_env</td>
+                    <td style="text-align: left">{{ job.job_env }}</td>
+                </tr>
+                <tr>
+                    <td>job_description</td>
+                    <td style="text-align: left">{{ job.job_description }}</td>
+                </tr>
+                <tr>
+                    <td>job_assigned_node</td>
+                    <td style="text-align: left">{{ job.job_assigned_node }}</td>
+                </tr>
+                <tr>
+                    <td>job_is_acceptance</td>
+                    <td style="text-align: left">{{ job.job_jenkins_page }}</td>
+                </tr>
+                <tr>
+                    <td>job_hudson_shell_command</td>
+                    <td>
+                        <pre style="text-align: left">{{ job.job_hudson_shell_command }}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>job_up_stream</td>
+                    <td style="text-align: left">{{ job.job_up_stream }}</td>
+                </tr>
+                <tr>
+                    <td>job_enabled</td>
+                    <td style="text-align: left">{{ job.job_enabled }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endfor %}

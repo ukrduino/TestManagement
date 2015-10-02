@@ -1,0 +1,15 @@
+{% extends 'BasePage.html' %}
+{% load staticfiles %}
+
+{% block jobs_configs_page %}
+    {% csrf_token %} {# FOR AJAX POST REQUESTS #}
+    <div class="row page_content" style="text-align: right">
+        <div class="btn-group" role="group" aria-label="..." style="margin-bottom: 20px">
+            <button type="button" class="btn btn-info show_jobs_configs" data-jenkins_page="Acceptance">Acceptance</button>
+            <button type="button" class="btn btn-info show_jobs_configs" data-jenkins_page="Trunk">Trunk</button>
+            <button type="button" class="btn btn-info show_jobs_configs" data-jenkins_page="New trunk">New trunk</button>
+        </div>
+        <div id="jobs_configs_in_template">
+        </div>
+    </div>
+{% endblock %}

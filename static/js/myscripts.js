@@ -22,11 +22,10 @@ $('#save_instances').click(function (event) {
     });
 });
 
-// ACCEPTANCE ACTIONS
-$('#get_acceptance_builds_info_from_jenkins').click(function (event) {
+$('#get_builds_info_from_jenkins').click(function (event) {
     event.preventDefault();
     $.ajax({
-        url: 'get_acceptance_builds_info_from_jenkins/',
+        url: 'get_builds_info_from_jenkins/',
         type: 'get', //this is the default though, you don't actually need to always mention it
         success: function () {
             alert("Successfully !!!");
@@ -34,6 +33,7 @@ $('#get_acceptance_builds_info_from_jenkins').click(function (event) {
     });
 });
 
+// ACCEPTANCE ACTIONS
 $('#get_acceptance_job_configs_from_jenkins').click(function (event) {
     event.preventDefault();
     $.ajax({
@@ -46,17 +46,6 @@ $('#get_acceptance_job_configs_from_jenkins').click(function (event) {
 });
 
 // TRUNK ACTIONS
-$('#get_trunk_builds_info_from_jenkins').click(function (event) {
-    event.preventDefault();
-    $.ajax({
-        url: 'get_trunk_builds_info_from_jenkins/',
-        type: 'get', //this is the default though, you don't actually need to always mention it
-        success: function () {
-            alert("Successfully !!!");
-        }
-    });
-});
-
 $('#get_trunk_job_configs_from_jenkins').click(function (event) {
     event.preventDefault();
     $.ajax({
@@ -96,7 +85,7 @@ function tests_for_job(data) {
 
 $('#myModal').on('show.bs.modal', function (e) {
     var stack_trace = $(e.relatedTarget).data('stack');
-    $(e.currentTarget).find('div.stack_trace').text(stack_trace)
+    $(e.currentTarget).find('pre.stack_trace').text(stack_trace)
 });
 
 $(function () {
@@ -106,20 +95,58 @@ $(function () {
     });
 });
 
-// SEARCH JOB PAGE BUTTON
+// SEARCH JOB PAGE
 $('#job_search_input').keyup(function () {
     $.ajax({
         type: 'POST',
-        url: 'by_groups/',                       //TODO use Django Template tags if possible
+        url: 'by_groups/',
         data: {
             'search_text' : $('#job_search_input').val(),
             'csrfmiddlewaretoken' : $('input[name=csrfmiddlewaretoken]').val()
         },
-        success: search_Successful,
+        success: job_search_successful,
         dataType: 'html'
     });
 });
 
-function search_Successful(data) {
+function job_search_successful(data) {
     $('#found_jobs_list_in_template').html(data);
+}
+
+$('#group_search_input').keyup(function () {
+    $.ajax({
+        type: 'POST',
+        url: 'search_group/',
+        data: {
+            'search_text' : $('#group_search_input').val(),
+            'csrfmiddlewaretoken' : $('input[name=csrfmiddlewaretoken]').val()
+        },
+        success: group_search_successful,
+        dataType: 'html'
+    });
+});
+
+function group_search_successful(data) {
+    $('#found_groups_list_in_template').html(data);
+}
+
+// JOBS CONFIGS PAGE
+$('.show_jobs_configs').click(function (event) {
+    event.preventDefault();
+    var jenkins_page = $(this).attr("data-jenkins_page");
+    alert(jenkins_page);
+    $.ajax({
+        url: 'show_jobs_configs/',
+        data: {
+            'jenkins_page': jenkins_page,
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        },
+        type: 'POST',
+        success: show_jobs_configs,
+        dataType: 'html'
+    });
+});
+
+function show_jobs_configs(data) {
+    $('#jobs_configs_in_template').html(data);
 }

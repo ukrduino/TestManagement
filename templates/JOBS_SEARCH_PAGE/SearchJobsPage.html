@@ -1,0 +1,31 @@
+{% extends 'BasePage.html' %}
+{% load staticfiles %}
+
+{% block search_jobs_page %}
+    <div class="row page_content">
+        <div class="col-lg-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {% csrf_token %}
+                    <input type="text" class="form-control" id="job_search_input"
+                           placeholder="Enter group(s) name(s), f.e. Renewal, WalletBalance ">
+                </div>
+                <div class="panel-body">
+                    <ul class="list-group" id="found_jobs_list_in_template"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <input type="text" class="form-control" id="group_search_input"
+                           placeholder="Instant search">
+                </div>
+                <div class="panel-body">
+                    <ul class="list-group" id="found_groups_list_in_template">
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

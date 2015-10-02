@@ -2,6 +2,7 @@
 {% load staticfiles %}
 
 {% block home_page %}
+
     <div class="jumbotron page_content">
         <h1>Welcome to auto-tests management!</h1>
 
@@ -14,7 +15,6 @@
                 {% endif %}
             </a>
             automated test cases</p>
-
         <p>They implemented in
             <a href="#" class="home_page_big_numbers">
                 {% if test_classes_number > 0 %}
@@ -23,9 +23,7 @@
                     0
                 {% endif %}
             </a>
-            test methods (selenium auto-tests
-        </p>
-
+            test methods (selenium auto-tests</p>
         <p>These tests are run in
             <a href="#" class="home_page_big_numbers">
                 {% if jobs_number > 0 %}
@@ -43,8 +41,7 @@
                 {% else %}
                     0
                 {% endif %}
-            </a> build reports</p>
-        <p>To retrieve actual data about tests/groups/builds/jobs you have to press "Update" button</p>
-        <p>Process will take approx. 20 minutes you will be notified with "Successful" pop up.</p>
+            </a>
+            build reports</p>
     </div>
 {% endblock %}

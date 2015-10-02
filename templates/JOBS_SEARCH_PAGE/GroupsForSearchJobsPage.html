@@ -1,0 +1,7 @@
+{% if found_groups_list|length %}
+    {% for group in found_groups_list %}
+        <li class="list-group-item">{{ group.test_group_name }}</li>
+    {% endfor %}
+{% else %}
+    <li class="list-group-item">No groups found</li>
+{% endif %}
