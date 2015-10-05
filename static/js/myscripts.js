@@ -1,10 +1,9 @@
-// HOME PAGE BUTTONS
-// START ACTIONS
+// DATA COLLECTION PAGE
 $('#parse_java').click(function (event) {
     event.preventDefault();
     $.ajax({
         url: 'parse_java_code/',
-        type: 'get', //this is the default though, you don't actually need to always mention it
+        type: 'get',
         success: function () {
             alert("Successfully !!!");
         }
@@ -15,57 +14,88 @@ $('#save_instances').click(function (event) {
     event.preventDefault();
     $.ajax({
         url: 'save_instances/',
-        type: 'get', //this is the default though, you don't actually need to always mention it
+        type: 'get',
         success: function () {
             alert("Successfully !!!");
         }
     });
 });
 
-$('#get_builds_info_from_jenkins').click(function (event) {
+$('.get_jobs').click(function (event) {
     event.preventDefault();
+    var jenkins_page = $(this).attr("data-jenkins_page");
     $.ajax({
-        url: 'get_builds_info_from_jenkins/',
-        type: 'get', //this is the default though, you don't actually need to always mention it
+        url: 'get_jobs/',
+        data: {
+            'jenkins_page': jenkins_page,
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        },
+        type: 'POST',
         success: function () {
             alert("Successfully !!!");
         }
     });
 });
 
-// ACCEPTANCE ACTIONS
-$('#get_acceptance_job_configs_from_jenkins').click(function (event) {
+$('.get_jobs_configs').click(function (event) {
     event.preventDefault();
+    var jenkins_page = $(this).attr("data-jenkins_page");
     $.ajax({
-        url: 'get_acceptance_job_configs_from_jenkins/',
-        type: 'get', //this is the default though, you don't actually need to always mention it
+        url: 'get_jobs_configs/',
+        data: {
+            'jenkins_page': jenkins_page,
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        },
+        type: 'POST',
         success: function () {
             alert("Successfully !!!");
         }
     });
 });
 
-// TRUNK ACTIONS
-$('#get_trunk_job_configs_from_jenkins').click(function (event) {
+$('.get_builds_and_save_results').click(function (event) {
     event.preventDefault();
+    var jenkins_page = $(this).attr("data-jenkins_page");
     $.ajax({
-        url: 'get_trunk_job_configs_from_jenkins/',
-        type: 'get', //this is the default though, you don't actually need to always mention it
+        url: 'get_builds_and_save_results/',
+        data: {
+            'jenkins_page': jenkins_page,
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        },
+        type: 'POST',
         success: function () {
             alert("Successfully !!!");
         }
     });
 });
 
-// ACCEPTANCE PAGE BUTTONS
+
+// JOBS RESULTS PAGE BUTTONS
 var job_id;
-$(function () {
+
+$('.show_jobs_results').click(function (event) {
+    event.preventDefault();
+    var jenkins_page = $(this).attr("data-jenkins_page");
+    $.ajax({
+        url: 'show_jobs_results/',
+        data: {
+            'jenkins_page': jenkins_page,
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        },
+        type: 'POST',
+        success: show_jobs_results_in_template,
+        dataType: 'html'
+    });
+});
+
+function show_jobs_results_in_template(data) {
+    $('#jobs_results_in_template').html(data);
     $('button:contains("LOAD DATA")').click(function () {
         job_id = $(this).attr("data-job_id");
         $('img#loader' + job_id).toggle();
         $.ajax({
             type: 'POST',
-            url: 'load_data/',                       //TODO use Django Template tags if possible
+            url: 'load_data/',
             data: {
                 'job_id' : job_id,
                 'csrfmiddlewaretoken' : $('input[name=csrfmiddlewaretoken]').val()
@@ -74,7 +104,7 @@ $(function () {
             dataType: 'html'
         });
     });
-});
+}
 
 function tests_for_job(data) {
     $('#' + job_id).html(data);
@@ -96,12 +126,25 @@ $(function () {
 });
 
 // SEARCH JOB PAGE
-$('#job_search_input').keyup(function () {
+$('#job_search_by_groups_input').keyup(function () {
     $.ajax({
         type: 'POST',
         url: 'by_groups/',
         data: {
-            'search_text' : $('#job_search_input').val(),
+            'search_text' : $('#job_search_by_groups_input').val(),
+            'csrfmiddlewaretoken' : $('input[name=csrfmiddlewaretoken]').val()
+        },
+        success: job_search_successful,
+        dataType: 'html'
+    });
+});
+
+$('#job_search_by_job_name_input').keyup(function () {
+    $.ajax({
+        type: 'POST',
+        url: 'by_job_name/',
+        data: {
+            'search_text' : $('#job_search_by_job_name_input').val(),
             'csrfmiddlewaretoken' : $('input[name=csrfmiddlewaretoken]').val()
         },
         success: job_search_successful,
@@ -134,7 +177,6 @@ function group_search_successful(data) {
 $('.show_jobs_configs').click(function (event) {
     event.preventDefault();
     var jenkins_page = $(this).attr("data-jenkins_page");
-    alert(jenkins_page);
     $.ajax({
         url: 'show_jobs_configs/',
         data: {

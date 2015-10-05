@@ -19,7 +19,7 @@ class Job(models.Model):
     job_jenkins_page = models.CharField(verbose_name="Jenkins page", max_length=200, null=True)
     job_hudson_shell_command = models.TextField(verbose_name="Job hudson shell command settings", null=True)  # TODO get from Job's XML
     job_up_stream = models.ForeignKey("self", null=True)  # TODO Get from jenkins or get from Job's XML
-    job_enabled = models.BooleanField(verbose_name="Is job enabled", default=True)  # TODO get from Job's XML
+    job_enabled = models.BooleanField(verbose_name="Is job enabled", default=True)
 
     def __str__(self):
         return self.job_name
@@ -28,9 +28,9 @@ class Job(models.Model):
         return self.job_name
 
 
-def create_new_job(name, link, is_acceptance):  # TODO move to class constructor
+def create_new_job(name, link, job_jenkins_page, is_enabled):  # TODO move to class constructor
     # creating new job
-    new_job = Job(job_name=name, job_link=link, job_is_acceptance=is_acceptance)
+    new_job = Job(job_name=name, job_link=link, job_jenkins_page=job_jenkins_page, job_enabled=is_enabled)
     new_job.save()
     print(" >>> Saved new job - " + new_job.job_name)
     return new_job
@@ -166,3 +166,6 @@ def create_new_test_result(build, test_class_name_from_report, passed, failed_te
 
 # Making migrations
 # http://stackoverflow.com/a/29898483
+# python manage.py makemigrations <app>
+# python manage.py migrate --fake-initial
+# python manage.py migrate

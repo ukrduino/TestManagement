@@ -23,7 +23,14 @@
                     0
                 {% endif %}
             </a>
-            test methods (selenium auto-tests</p>
+            test methods (
+            <a href="#" class="home_page_big_numbers">
+                {% if groups_number > 0 %}
+                    {{ groups_number }}
+                {% else %}
+                    0
+                {% endif %}
+            </a> groups)</p>
         <p>These tests are run in
             <a href="#" class="home_page_big_numbers">
                 {% if jobs_number > 0 %}

@@ -2,7 +2,6 @@ import re
 
 from jenkinsapi.jenkins import Jenkins
 from bs4 import BeautifulSoup
-
 from selenium import webdriver
 import untangle
 
@@ -19,47 +18,45 @@ def get_server_instance():
 
 
 def get_acceptance_builds_info_from_jenkins():
-    get_results_from_jenkins(ACCEPTANCE_URL, EXCLUDED_ACCEPTANCE_JOBS, True)
+    get_results_from_jenkins(ACCEPTANCE)
 
 
 def get_trunk_builds_info_from_jenkins():
-    get_results_from_jenkins(TRUNK_URL, EXCLUDED_TRUNK_JOBS, False)
+    get_results_from_jenkins(TRUNK)
 
 
-def get_results_from_jenkins(view_url, excluded_jobs, is_acceptance):
-    print(" > cleaning DB")
-    Job.objects.all().delete()
-    JobBuild.objects.all().delete()
-    TestResult.objects.all().delete()
-    print(" > Lets get build results from uncle Jenkins")
+def get_new_trunk_builds_info_from_jenkins():
+    get_results_from_jenkins(NEW_TRUNK)
+
+
+def get_results_from_jenkins(job_jenkins_page):
+    print(" > Lets get " + job_jenkins_page + " build results from uncle Jenkins")
     server = get_server_instance()
-    # opening acceptance view
-    view = server.get_view_by_url(view_url)
-    # getting all jobs from view
-    jobs_dict = view.get_job_dict()
-    print(" >> We have - " + str(len(jobs_dict) - len(excluded_jobs)) + " jobs in " + view_url)
-    for job_title, job_link in jobs_dict.items():
-        # filtering jobs
-        if job_title not in excluded_jobs:
-            job_inst = server.get_job(job_title)
-            # creating new job
-            new_job = create_new_job(job_title, job_link, is_acceptance)
+    for job in Job.objects.filter(job_jenkins_page=job_jenkins_page):
+            job_inst = server.get_job(job.job_name)
             # getting builds for job
             builds_dict = job_inst.get_build_dict()
             for build_number, build_link in builds_dict.items():
-                process_build_data(job_inst, new_job, build_number, build_link)
+                process_build_data(job_inst, job, build_number, build_link)
 
 
-def process_build_data(job_inst, new_job, build_number, build_link):
+def process_build_data(job_inst, job, build_number, build_link):
     build_inst = job_inst.get_build(build_number)
     build_run_time = str(build_inst.get_duration()).split('.')[0]
     build_date = build_inst.get_timestamp().strftime('%d.%m.%Y %H:%M')
+    print(build_date)
     # filtering builds that have artifacts
     artifacts = build_inst.get_artifact_dict()
     for artifact_name, artifact in artifacts.items():
         if artifact_name == BUILD_RESULTS:
+            # creating new build with link to QA_Team_Report
+            new_build = create_new_build(job,
+                                         build_number,
+                                         build_link + BUILD_RESULTS_REPORT_LINK,
+                                         build_date,
+                                         build_run_time)
             save_artifact(artifact)
-            process_artifact(new_job, build_number, build_link, build_date, build_run_time)
+            process_artifact(new_build)
 
 
 def save_artifact(artifact):
@@ -68,13 +65,7 @@ def save_artifact(artifact):
     artifact.save_to_dir(TARGET_DIR)
 
 
-def process_artifact(new_job, build_number, build_link, build_date, build_run_time):
-    # creating new build with link to QA_Team_Report
-    new_build = create_new_build(new_job,
-                                 build_number,
-                                 build_link + BUILD_RESULTS_REPORT_LINK,
-                                 build_date,
-                                 build_run_time)
+def process_artifact(new_build):
     html_report_file = open(BUILD_RESULTS_FILE_PATH)
     html_report_soup = BeautifulSoup(html_report_file, 'html.parser')
     # unique_test_classes_set used to avoid methods be at the same time in 'failed', 'skipped', and 'passed' groups
@@ -92,7 +83,7 @@ def process_artifact(new_job, build_number, build_link, build_date, build_run_ti
                 unique_test_classes_set.add(failed_test_class_name)
             else:
                 logger.info(" >>>>>> TEST RESULTS ERROR - Test class " + failed_test_class_name +
-                            " has more then one failed result in build #" + str(build_number))
+                            " has more then one failed result in build #" + str(new_build.build_number))
 
     skipped_test_methods = html_report_soup.find_all(id="skippedTest")
     if len(skipped_test_methods) > 0:
@@ -114,7 +105,7 @@ def process_artifact(new_job, build_number, build_link, build_date, build_run_ti
                 unique_test_classes_set.add(passed_test_class_name)
             else:
                 logger.info(" >>>>>> TEST RESULTS ERROR - Test class " + passed_test_class_name +
-                            " already is in 'failed' or 'skipped' tests in build #" + str(build_number))
+                            " already is in 'failed' or 'skipped' tests in build #" + str(new_build.build_number))
     # saving successful_build if its successful
     if successful_build and len(unique_test_classes_set) > 0:
         new_build.build_successful = True
@@ -128,16 +119,21 @@ def process_artifact(new_job, build_number, build_link, build_date, build_run_ti
     os.remove(BUILD_RESULTS_FILE_PATH)
 
 
+# SAVING JOBS CONFIGS TO JOBS FROM DB
+
 def get_acceptance_job_configs_from_jenkins():
-    add_groups_to_jobs(ACCEPTANCE_URL, EXCLUDED_ACCEPTANCE_JOBS)
+    add_config_data_to_jobs(ACCEPTANCE)
 
 
 def get_trunk_job_configs_from_jenkins():
-    add_groups_to_jobs(TRUNK_URL, EXCLUDED_TRUNK_JOBS)
+    add_config_data_to_jobs(TRUNK)
 
 
-def add_groups_to_jobs(view_url, excluded_jobs):
-    config_links_dict = get_jenkins_jobs_configs_links_dict(view_url, excluded_jobs)
+def get_new_trunk_job_configs_from_jenkins():
+    add_config_data_to_jobs(NEW_TRUNK)
+
+
+def add_config_data_to_jobs(job_jenkins_page):
     # setting webdriver to parse Jenkins
     firefox_profile = webdriver.FirefoxProfile(LOCAL_FIREFOX_PROFILE)
     driver = webdriver.Firefox(firefox_profile)
@@ -148,14 +144,12 @@ def add_groups_to_jobs(view_url, excluded_jobs):
     driver.find_element_by_name("j_password").send_keys(PASSWORD)
     driver.find_element_by_name("Submit").click()
     # getting config files
-    for job_name, config_link in config_links_dict.items():
-        # getting xml data for job
-        driver.get(config_link)
+    for job in Job.objects.filter(job_jenkins_page=job_jenkins_page):
+        driver.get(job.job_link + CONFIG_FILE)
         config_xml = driver.page_source
-        groups_list = get_groups_list_from_job_config(job_name, config_xml)
-        # adding groups to job
-        job_from_db = Job.objects.get(job_name=job_name)
-        print(job_from_db.job_name)
+        # getting data from xml
+        groups_list = get_groups_list_from_job_config(job.job_name, config_xml)
+        # adding data to job
         for group_name in groups_list:
             if not TestGroup.objects.filter(test_group_name=group_name):
                 new_group = TestGroup()
@@ -163,23 +157,8 @@ def add_groups_to_jobs(view_url, excluded_jobs):
                 new_group.save()
                 print("Saved group - " + new_group.test_group_name)
             group_from_db = TestGroup.objects.get(test_group_name=group_name)
-            group_from_db.job = job_from_db
+            group_from_db.job = job
             group_from_db.save()
-
-
-def get_jenkins_jobs_configs_links_dict(view_url, excluded_jobs):
-    config_links_dict = dict()
-    print(" > Lets get jobs configs from uncle Jenkins")
-    server = get_server_instance()
-    # opening acceptance view
-    view = server.get_view_by_url(view_url)
-    # getting all jobs from view
-    jobs_dict = view.get_job_dict()
-    print(" >> We have - " + str(len(jobs_dict) - len(excluded_jobs)) + " jobs in " + view_url)
-    for job_title, job_link in jobs_dict.items():
-        if job_title not in excluded_jobs:
-            config_links_dict[job_title] = job_link + CONFIG_FILE
-    return config_links_dict
 
 
 def get_groups_list_from_job_config(job_name, config_xml):
@@ -190,3 +169,32 @@ def get_groups_list_from_job_config(job_name, config_xml):
         return groups_data.replace("TEST_GROUPS=", "").split(",")
     else:
         logger.info("TEST_GROUPS ABSENT IN JOB CONFIGS - (" + groups_data + ") for job (" + job_name + ")")
+
+
+# SAVING JOBS TO DB
+def get_acceptance_jobs_from_jenkins():
+    get_jobs_from_jenkins(ACCEPTANCE_URL, EXCLUDED_ACCEPTANCE_JOBS, ACCEPTANCE)
+
+
+def get_trunk_jobs_from_jenkins():
+    get_jobs_from_jenkins(TRUNK_URL, EXCLUDED_TRUNK_JOBS, TRUNK)
+
+
+def get_new_trunk_jobs_from_jenkins():
+    get_jobs_from_jenkins(NEW_TRUNK_URL, EXCLUDED_NEW_TRUNK_JOBS, NEW_TRUNK)
+
+
+def get_jobs_from_jenkins(view_url, excluded_jobs, job_jenkins_page):
+    print(" > Lets get " + job_jenkins_page + " jobs from uncle Jenkins")
+    server = get_server_instance()
+    # opening acceptance view
+    view = server.get_view_by_url(view_url)
+    # getting all jobs from view
+    jobs_dict = view.get_job_dict()
+    print(" >> We have - " + str(len(jobs_dict) - len(excluded_jobs)) + " jobs in " + job_jenkins_page)
+    for job_title, job_link in jobs_dict.items():
+        # filtering jobs
+        if job_title not in excluded_jobs:
+            job_inst = server.get_job(job_title)
+            # creating new job
+            create_new_job(job_title, job_link, job_jenkins_page, job_inst.is_enabled())

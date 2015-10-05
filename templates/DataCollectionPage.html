@@ -4,6 +4,7 @@
 
 {% block data_collection_page %}
     <div class="row page_content">
+    {% csrf_token %}
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h3 class="panel-title" style="text-align: center">START ACTIONS</h3>
@@ -17,7 +18,7 @@
                         <a class="btn btn-default" id="save_instances">Save instances to DB</a>
                     </div>
                     <div class="btn-group" role="group">
-                        <a class="btn btn-default" id="get_builds_info_from_jenkins">Get builds info from Jenkins</a>
+                        <a class="btn btn-default" id="get_builds_info_from_jenkins">...........</a>
                     </div>
                 </div>
             </div>
@@ -29,14 +30,16 @@
             <div class="panel-body">
                 <div class="btn-group btn-group-justified" role="group" aria-label="">
                     <div class="btn-group" role="group">
-                        <a class="btn btn-default" id="get_acceptance_job_configs_from_jenkins">Get jobs configs from
+                        <a class="btn btn-default get_jobs" data-jenkins_page="Acceptance">Get jobs from
                             Jenkins</a>
                     </div>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default">...........</button>
+                        <a class="btn btn-default get_jobs_configs" data-jenkins_page="Acceptance">Get jobs configs from
+                            Jenkins</a>
                     </div>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default">...........</button>
+                        <button type="button" class="btn btn-default get_builds_and_save_results"
+                                data-jenkins_page="Acceptance">Get builds from Jenkins</button>
                     </div>
                 </div>
             </div>
@@ -48,17 +51,23 @@
             <div class="panel-body">
                 <div class="btn-group btn-group-justified" role="group" aria-label="">
                     <div class="btn-group" role="group">
-                        <a class="btn btn-default" id="get_trunk_job_configs_from_jenkins">Get jobs configs from
+                        <a class="btn btn-default get_jobs" data-jenkins_page="Trunk">Get jobs from
                             Jenkins</a>
                     </div>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default">...........</button>
+                        <a class="btn btn-default get_jobs_configs" data-jenkins_page="Trunk">Get jobs configs from
+                            Jenkins</a>
                     </div>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default">...........</button>
+                        <button type="button" class="btn btn-default get_builds_and_save_results"
+                                data-jenkins_page="Trunk">Get builds from Jenkins</button>
                     </div>
                 </div>
             </div>
+        </div>
+        <div>
+            <a class="btn btn-danger" href="{% url 'delete_jobs' %}">DELETE  ALL  JOBS</a>
+            <a class="btn btn-danger" href="{% url 'delete_builds_results' %}" style="margin-left: 50px">DELETE  ALL  BUILDS RESULTS</a>
         </div>
     </div>
 {% endblock %}
