@@ -13,12 +13,12 @@ class Job(models.Model):
 
     job_name = models.CharField(verbose_name="Job name", max_length=200)
     job_env = models.CharField(verbose_name="Job environment", max_length=200, null=True)  # TODO get from Job's XML
-    job_description = models.CharField(verbose_name="Job description", max_length=200, null=True)  # TODO get from Job's XML
+    job_description = models.CharField(verbose_name="Job description", max_length=200, null=True)
     job_assigned_node = models.CharField(verbose_name="Job assigned node", max_length=200, null=True)  # TODO get from Job's XML
     job_link = models.CharField(verbose_name="Job link", max_length=200, null=True)
     job_jenkins_page = models.CharField(verbose_name="Jenkins page", max_length=200, null=True)
-    job_hudson_shell_command = models.TextField(verbose_name="Job hudson shell command settings", null=True)  # TODO get from Job's XML
-    job_up_stream = models.ForeignKey("self", null=True)  # TODO Get from jenkins or get from Job's XML
+    job_hudson_shell_command = models.TextField(verbose_name="Job hudson shell command settings", null=True)
+    job_up_stream = models.ForeignKey("self", null=True)
     job_enabled = models.BooleanField(verbose_name="Is job enabled", default=True)
 
     def __str__(self):

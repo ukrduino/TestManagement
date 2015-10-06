@@ -64,9 +64,9 @@ def get_jobs_configs_from_jenkins(request):
         if jenkins_page == ACCEPTANCE:
             JenkinsAPI.get_acceptance_job_configs_from_jenkins()
         if jenkins_page == TRUNK:
-            JenkinsAPI.get_trunk_jobs_from_jenkins()
+            JenkinsAPI.get_trunk_job_configs_from_jenkins()
         if jenkins_page == NEW_TRUNK:
-            JenkinsAPI.get_new_trunk_jobs_from_jenkins()
+            JenkinsAPI.get_new_trunk_job_configs_from_jenkins()
     return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
 
 

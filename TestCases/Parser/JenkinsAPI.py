@@ -4,6 +4,7 @@ from jenkinsapi.jenkins import Jenkins
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import untangle
+from untangle import Element
 
 from TestManagement.local_settings import *
 from TestCases.models import *
@@ -55,6 +56,7 @@ def process_build_data(job_inst, job, build_number, build_link):
                                          build_link + BUILD_RESULTS_REPORT_LINK,
                                          build_date,
                                          build_run_time)
+            print("build_date - " + new_build.build_date)
             save_artifact(artifact)
             process_artifact(new_build)
 
@@ -147,28 +149,66 @@ def add_config_data_to_jobs(job_jenkins_page):
     for job in Job.objects.filter(job_jenkins_page=job_jenkins_page):
         driver.get(job.job_link + CONFIG_FILE)
         config_xml = driver.page_source
+        print("Requesting data for job " + job.job_name)
         # getting data from xml
-        groups_list = get_groups_list_from_job_config(job.job_name, config_xml)
+        config_data_dict = get_data_from_job_config(job.job_name, config_xml)
         # adding data to job
-        for group_name in groups_list:
-            if not TestGroup.objects.filter(test_group_name=group_name):
-                new_group = TestGroup()
-                new_group.test_group_name = group_name
-                new_group.save()
-                print("Saved group - " + new_group.test_group_name)
-            group_from_db = TestGroup.objects.get(test_group_name=group_name)
-            group_from_db.job = job
-            group_from_db.save()
+        if len(config_data_dict["groups_list"]):
+            for group_name in config_data_dict["groups_list"]:
+                if not TestGroup.objects.filter(test_group_name=group_name):
+                    new_group = TestGroup()
+                    new_group.test_group_name = group_name
+                    new_group.save()
+                    print("Saved group - " + new_group.test_group_name)
+                group_from_db = TestGroup.objects.get(test_group_name=group_name)
+                group_from_db.job = job
+                group_from_db.save()
+        # saving shell command
+        job.job_hudson_shell_command = config_data_dict["shell_command"]
+        job.job_description = config_data_dict["job_description"]
+        if len(config_data_dict["up_stream_jobs_names"]):
+            for up_stream_job_name in config_data_dict["up_stream_jobs_names"]:
+                up_stream_job = Job.objects.get(job_name=up_stream_job_name)
+                job.job_up_stream = up_stream_job
+        job.save()
+        print("Job updated")
+        print(job.job_name)
+        print(job.job_description)
+        print(job.job_link)
+        print(job.job_jenkins_page)
+        print(job.job_hudson_shell_command)
+        print(job.job_up_stream)
+        print(job.job_enabled)
+        print("---------------")
 
 
-def get_groups_list_from_job_config(job_name, config_xml):
-    groups_data = ""
+def get_data_from_job_config(job_name, config_xml):
+    config_data_dict = dict()
     config_dict = untangle.parse(config_xml)
-    groups_data = config_dict.project.builders.EnvInjectBuilder.info.propertiesContent.cdata
-    if groups_data.startswith("TEST_GROUPS="):
-        return groups_data.replace("TEST_GROUPS=", "").split(",")
+    # print(config_xml)
+    # getting groups list
+    env_inject_builder_tag = config_dict.project.builders.EnvInjectBuilder
+    if not isinstance(env_inject_builder_tag, Element):
+        # special case for job Check environment and start all tests
+        # if env_inject_builder_tag is List
+        properties_content_tag_list= env_inject_builder_tag[1].info.propertiesContent.cdata.split("\n")
+        for property_content in properties_content_tag_list:
+            if property_content.startswith("TEST_GROUPS="):
+                config_data_dict["groups_list"] = property_content.replace("TEST_GROUPS=", "").split(",")
     else:
-        logger.info("TEST_GROUPS ABSENT IN JOB CONFIGS - (" + groups_data + ") for job (" + job_name + ")")
+        properties_content_tag_list = config_dict.project.builders.EnvInjectBuilder.info.propertiesContent.cdata.split("\n")
+        for property_content in properties_content_tag_list:
+            if property_content.startswith("TEST_GROUPS="):
+                config_data_dict["groups_list"] = property_content.replace("TEST_GROUPS=", "").split(",")
+    # getting shell command
+    config_data_dict["shell_command"] = config_dict.project.builders.hudson_tasks_Shell.command.cdata
+    # getting job description
+    config_data_dict["job_description"] = config_dict.project.description.cdata
+    server = get_server_instance()
+    job_inst = server.get_job(job_name)
+    # getting upstream jobs
+    config_data_dict["up_stream_jobs_names"] = job_inst.get_upstream_job_names()
+    return config_data_dict
 
 
 # SAVING JOBS TO DB
