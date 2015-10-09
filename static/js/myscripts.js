@@ -104,6 +104,7 @@ function show_jobs_results_in_template(data) {
             dataType: 'html'
         });
     });
+    $('[data-toggle="tooltip"]').tooltip()
 }
 
 function tests_for_job(data) {

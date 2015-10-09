@@ -18,7 +18,7 @@
             </th>
             {% for build in builds %}
                 <th class="build">
-                    <p data-toggle="tooltip" data-placement="top" title={{ build.build_date }}>
+                    <p data-toggle="tooltip" data-placement="top" title="{{ build.build_date }}">
                         {% if build.build_successful %}
                             <a class="text-success"
                                href="{{ build.build_link }} target=_blank">{{ build.build_number }}</a>
