@@ -1,4 +1,6 @@
-from django.shortcuts import render_to_response
+import json
+
+from django.shortcuts import render_to_response, HttpResponse
 from django.template import RequestContext
 
 from TestManagement.local_settings import *
@@ -23,16 +25,23 @@ def data_collection_page(request):
     return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
 
 
-def delete_jobs(request):
-    print(" > cleaning DB (deleting Jobs)")
-    Job.objects.all().delete()
-    return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
-
-
-def delete_builds_results(request):
-    print(" > cleaning DB (deleting JobBuilds, TestResult)")
-    JobBuild.objects.all().delete()
-    TestResult.objects.all().delete()
+def delete(request):
+    if request.method == 'POST':
+        object_to_delete = request.POST['object_to_delete']
+        if object_to_delete == "all tests":
+            logger.info(" > cleaning DB (deleting Test classes and Test cases)")
+            TestClass.objects.all().delete()
+            TestCase.objects.all().delete()
+        if object_to_delete == "all groups":
+            logger.info(" > cleaning DB (deleting Groups)")
+            TestGroup.objects.all().delete()
+        if object_to_delete == "all jobs":
+            logger.info(" > cleaning DB (deleting Jobs)")
+            Job.objects.all().delete()
+        if object_to_delete == "all builds and results":
+            logger.info(" > cleaning DB (deleting JobBuilds, TestResult)")
+            JobBuild.objects.all().delete()
+            TestResult.objects.all().delete()
     return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
 
 
@@ -74,11 +83,11 @@ def get_builds_and_save_results(request):
     if request.method == 'POST':
         jenkins_page = request.POST['jenkins_page']
         if jenkins_page == ACCEPTANCE:
-            JenkinsAPI.get_acceptance_builds_info_from_jenkins()
+            JenkinsAPI.get_acceptance_build_results_from_jenkins()
         if jenkins_page == TRUNK:
-            JenkinsAPI.get_trunk_builds_info_from_jenkins()
+            JenkinsAPI.get_trunk_build_results_from_jenkins()
         if jenkins_page == NEW_TRUNK:
-            JenkinsAPI.get_new_trunk_builds_info_from_jenkins()
+            JenkinsAPI.get_new_trunk_build_results_from_jenkins()
     return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
 
 
@@ -89,13 +98,17 @@ def search_jobs_page(request):
 def search_jobs_by_group_name(request):
     args = dict()
     args['found_jobs_list'] = search_jobs(request, BY_GROUP_NAME)
-    return render_to_response("JOBS_SEARCH_PAGE/JobsForSearchJobsPage.html", args, context_instance=RequestContext(request))
+    return render_to_response("JOBS_SEARCH_PAGE/JobsForSearchJobsPage.html",
+                              args,
+                              context_instance=RequestContext(request))
 
 
 def search_jobs_by_job_name(request):
     args = dict()
     args['found_jobs_list'] = search_jobs(request, BY_JOB_NAME)
-    return render_to_response("JOBS_SEARCH_PAGE/JobsForSearchJobsPage.html", args, context_instance=RequestContext(request))
+    return render_to_response("JOBS_SEARCH_PAGE/JobsForSearchJobsPage.html",
+                              args,
+                              context_instance=RequestContext(request))
 
 
 def search_jobs(request, by):
@@ -123,14 +136,13 @@ def search_group(request):
     groups_set = set()
     if request.method == 'POST':
         group_name = request.POST['search_text']
-        print(group_name)
         if len(group_name) > 0:
             groups = TestGroup.objects.filter(test_group_name__contains=group_name)
-            # print(groups)
             groups_set.update(groups)
             args['found_groups_list'] = groups_set
-            print(args['found_groups_list'])
-    return render_to_response("JOBS_SEARCH_PAGE/GroupsForSearchJobsPage.html", args, context_instance=RequestContext(request))
+    return render_to_response("JOBS_SEARCH_PAGE/GroupsForSearchJobsPage.html",
+                              args,
+                              context_instance=RequestContext(request))
 
 
 # JOBS RESULTS PAGE
@@ -143,9 +155,7 @@ def show_jobs_results(request):
     jobs_with_builds = dict()
     if request.method == 'POST':
         jenkins_page = request.POST['jenkins_page']
-        print(jenkins_page)
         for job in Job.objects.filter(job_jenkins_page=jenkins_page):
-            print(job)
             jobs_with_builds[job] = JobBuild.objects.filter(job__id=job.id).order_by('build_number')
     args['jobs_with_builds'] = jobs_with_builds
     return render_to_response("JOBS_PAGE/JobsForJobsPage.html", args, context_instance=RequestContext(request))
@@ -155,7 +165,6 @@ def show_test_for_jobs(request):
     args = dict()
     if request.method == 'POST':
         job_id = request.POST['job_id']
-        print(job_id)
         builds = JobBuild.objects.filter(job__id=job_id).order_by('build_number')
         tests_for_job = find_tests_for_job_from_builds(builds)
         tests_with_results = dict()
@@ -207,5 +216,16 @@ def show_all_test_cases(request):
         test_class_with_groups[test_class] = groups
         test_case_with_test_class[test_case] = test_class_with_groups
     args["test_case_with_test_class"] = test_case_with_test_class
-    return render_to_response("TEST_CLASSES_PAGE/TestClassesPage.html", args, context_instance=RequestContext(request))
+    return render_to_response("TEST_CLASSES_PAGE/TestClassesPage.html",
+                              args,
+                              context_instance=RequestContext(request))
 
+# http://stackoverflow.com/a/32466453
+def update_progress_bar(request):
+    if request.method == 'POST':
+        print(request.POST['process'])
+        progress_bar = ProgressBar.objects.last()
+        resp = {'current_val': progress_bar.progress_bar_current_val,
+                'max_val': progress_bar.progress_bar_max_val,
+                }
+        return HttpResponse(json.dumps(resp))

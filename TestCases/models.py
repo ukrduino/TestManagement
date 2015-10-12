@@ -32,7 +32,6 @@ def create_new_job(name, link, job_jenkins_page, is_enabled):  # TODO move to cl
     # creating new job
     new_job = Job(job_name=name, job_link=link, job_jenkins_page=job_jenkins_page, job_enabled=is_enabled)
     new_job.save()
-    print(" >>> Saved new job - " + new_job.job_name)
     return new_job
 
 
@@ -65,7 +64,6 @@ def create_new_build(new_job, build_number, build_link, build_date, build_run_ti
                          build_date=build_date,
                          build_run_time=build_run_time)
     new_build.save()
-    print(" >>>> Saved new build #" + str(new_build.build_number) + " for >>> " + new_build.job.job_name)
     return new_build
 
 
@@ -152,7 +150,6 @@ def create_new_test_result(build, test_class_name_from_report, passed, failed_te
                                              test_passed=passed,
                                              test_stack_trace=failed_test_class_stack_trace)
                 new_test_result.save()
-                print("Saved TestResult #" + str(new_test_result.id) + " for " + test_class_obj.test_class_name)
     elif len(test_classes_from_db) > 1:
         logger.info("TEST CLASS DUPLICATION - 2 or more test class with name (or similar name)" +
                     test_class_name_from_report + " found in DB (Build id #" + str(build.id) + ")")
@@ -163,6 +160,32 @@ def create_new_test_result(build, test_class_name_from_report, passed, failed_te
         logger.info("TEST CLASS ABSENT - No test class with name " + test_class_name_from_report +
                     " found in DB (Build id #" + str(build.id) + ")")
         logger.info("Result not saved")
+
+
+class ProgressBar(models.Model):
+
+    class Meta:
+        db_table = 'progress_bar'
+        verbose_name = 'Progress bar data'
+
+    progress_bar_max_val = models.IntegerField(verbose_name="Max value of progress bar", default=0)
+    progress_bar_current_val = models.IntegerField(verbose_name="Current value of progress bar", default=0)
+
+
+def init_progress_bar():
+    if not ProgressBar.objects.all():
+        progress_bar = ProgressBar()
+        progress_bar.save()
+        return progress_bar
+    else:
+        progress_bar = ProgressBar.objects.last()
+        progress_bar.progress_bar_max_val = 0
+        progress_bar.progress_bar_current_val = 0
+        progress_bar.save()
+        return progress_bar
+
+
+
 
 # Making migrations
 # http://stackoverflow.com/a/29898483

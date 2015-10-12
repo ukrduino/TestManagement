@@ -35,8 +35,11 @@ def get_tests_headers_from_java_code():
 
 
 def create_instances_and_put_to_db():
+    progress_bar = init_progress_bar()
     my_file = codecs.open(result_file_path, "r", "cp1250")
     data = my_file.readlines()
+    progress_bar.progress_bar_max_val = len(data)
+    progress_bar.save()
     for class_header in data:
         # creating new instance of TestClass
         new_test_class = TestClass()
@@ -44,36 +47,32 @@ def create_instances_and_put_to_db():
         test_class_name_search_result = re.findall("public void (.+?)\\n", class_header)  # TODO Some shit at the end of class name
         for name in test_class_name_search_result:
             new_test_class.test_class_name = name.replace(" ", "").replace('\n', '').replace('\t', ' ')
-            print(">>>>> Test class name - " + new_test_class.test_class_name)
         # saving TestClass with name only
         new_test_class.save()
-        print(">>>>> Test class id - " + str(new_test_class.id))
         # searching if test class enabled
         enabled_search_result = re.findall("enabled(.+?),", class_header)
         for is_enabled in enabled_search_result:
             enabled = is_enabled.replace(" ", "").replace("=", "")
-            print(">>>>> Test class enabled - " + enabled)
             if enabled == "false":
                 new_test_class.test_class_enabled = False
                 comment_search_result = re.findall("//(.+?)description", class_header)
                 if len(comment_search_result) > 0:
                     for comment in comment_search_result:
-                        print("comment - " + comment)
                         new_test_class.test_class_comment = comment
                 blocked_by_ticket_search_result = re.findall("#([0-9]+)description", class_header)
                 if len(blocked_by_ticket_search_result) > 0:
                     if len(blocked_by_ticket_search_result) == 1:
                         for ticket in blocked_by_ticket_search_result:
                             new_test_class.test_class_blocked_by_ticket = ticket
-                            print("ticket - " + ticket)
                     else:
                         blocked_by_ticket = ",".join(blocked_by_ticket_search_result)
                         new_test_class.test_class_blocked_by_ticket = blocked_by_ticket
-                        print("blocked_by_ticket - #" + blocked_by_ticket)
             new_test_class.save()
         # searching test groups in class headers
         add_test_cases_to_test_class(class_header, new_test_class)
         add_groups_to_test_class(class_header, new_test_class)
+        progress_bar.progress_bar_current_val += 1
+        progress_bar.save()
     print(">>>>> All instances created")
 
 
@@ -91,11 +90,9 @@ def add_groups_to_test_class(class_header, new_test_class):
                     new_group = TestGroup()
                     new_group.test_group_name = grop_name
                     new_group.save()
-                    print("Saved group - " + new_group.test_group_name)
             for grop_name in groups_in_test_list:
                 group = TestGroup.objects.get(test_group_name=grop_name)
                 new_test_class.test_class_group.add(group)
-            print(new_test_class.test_class_group.all())
 
 
 def add_test_cases_to_test_class(class_header, new_test_class):
@@ -119,10 +116,6 @@ def add_test_cases_to_test_class(class_header, new_test_class):
                     new_test_case.save()
                 test_case = TestCase.objects.get(test_case_link=TEST_CASE_LINK + link)
                 test_case.test_case_class = new_test_class
-                print(">>>>>>>> Test case id - " + str(test_case.id))
-                print(">>>>>>>> Test case name - " + test_case.test_case_name)
-                print(">>>>>>>> Test case link - " + test_case.test_case_link)
-                print(">>>>>>>> Test case class - " + test_case.test_case_class.test_class_name)
                 test_case.save()
 
 

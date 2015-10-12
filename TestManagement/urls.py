@@ -1,6 +1,5 @@
-from django.conf.urls import include, url, patterns
+from django.conf.urls import include, url
 from django.contrib import admin
-from django.conf import settings
 
 urlpatterns = [
     url(r'^data_collection/$', 'TestCases.views.data_collection_page', name="data_collection"),
@@ -9,10 +8,9 @@ urlpatterns = [
     url(r'^data_collection/get_jobs/$', 'TestCases.views.get_jobs_from_jenkins'),
     url(r'^data_collection/get_jobs_configs/$', 'TestCases.views.get_jobs_configs_from_jenkins'),
     url(r'^data_collection/get_builds_and_save_results/$', 'TestCases.views.get_builds_and_save_results'),
-    url(r'^data_collection/delete_jobs/$', 'TestCases.views.delete_jobs',
-        name="delete_jobs"),
-    url(r'^data_collection/delete_builds_results/$', 'TestCases.views.delete_builds_results',
-        name="delete_builds_results"),
+    url(r'^data_collection/delete/$', 'TestCases.views.delete'),
+    url(r'^data_collection/json/$', 'TestCases.views.update_progress_bar'),
+
 
     url(r'^search_jobs/$', 'TestCases.views.search_jobs_page', name="search_jobs"),
     url(r'^search_jobs/by_groups/$', 'TestCases.views.search_jobs_by_group_name'),
@@ -32,9 +30,3 @@ urlpatterns = [
 
     url(r'^all_test_cases/$', 'TestCases.views.show_all_test_cases', name="show_all_test_cases"),
 ]
-
-if settings.DEBUG:
-        import debug_toolbar
-        urlpatterns += patterns('',
-                                url(r'^__debug__/', include(debug_toolbar.urls)),
-                                )

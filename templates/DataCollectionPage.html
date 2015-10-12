@@ -4,7 +4,7 @@
 
 {% block data_collection_page %}
     <div class="row page_content">
-    {% csrf_token %}
+        {% csrf_token %}
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h3 class="panel-title" style="text-align: center">START ACTIONS</h3>
@@ -22,6 +22,7 @@
                     </div>
                 </div>
             </div>
+            <div id="progressDiv"></div>
         </div>
         <div class="panel panel-info">
             <div class="panel-heading">
@@ -39,7 +40,8 @@
                     </div>
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-default get_builds_and_save_results"
-                                data-jenkins_page="Acceptance">Get builds from Jenkins</button>
+                                data-jenkins_page="Acceptance">Get builds from Jenkins
+                        </button>
                     </div>
                 </div>
             </div>
@@ -60,14 +62,19 @@
                     </div>
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-default get_builds_and_save_results"
-                                data-jenkins_page="Trunk">Get builds from Jenkins</button>
+                                data-jenkins_page="Trunk">Get builds from Jenkins
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
         <div>
-            <a class="btn btn-danger" href="{% url 'delete_jobs' %}">DELETE  ALL  JOBS</a>
-            <a class="btn btn-danger" href="{% url 'delete_builds_results' %}" style="margin-left: 50px">DELETE  ALL  BUILDS RESULTS</a>
+            <button class="btn btn-danger delete" style="margin-left: 50px" data-delete="all tests">DELETE ALL TESTS</button>
+            <button class="btn btn-danger delete" style="margin-left: 50px" data-delete="all groups">DELETE ALL GROUPS</button>
+            <button class="btn btn-danger delete" style="margin-left: 50px" data-delete="all jobs">DELETE ALL JOBS</button>
+            <button class="btn btn-danger delete" style="margin-left: 50px" data-delete="all builds and results">DELETE
+                ALL BUILDS RESULTS
+            </button>
         </div>
     </div>
 {% endblock %}
