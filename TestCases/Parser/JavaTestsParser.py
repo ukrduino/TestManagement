@@ -35,11 +35,9 @@ def get_tests_headers_from_java_code():
 
 
 def create_instances_and_put_to_db():
-    progress_bar = init_progress_bar()
     my_file = codecs.open(result_file_path, "r", "cp1250")
     data = my_file.readlines()
-    progress_bar.progress_bar_max_val = len(data)
-    progress_bar.save()
+    progress_bar = init_progress_bar(len(data))
     for class_header in data:
         # creating new instance of TestClass
         new_test_class = TestClass()
@@ -71,8 +69,8 @@ def create_instances_and_put_to_db():
         # searching test groups in class headers
         add_test_cases_to_test_class(class_header, new_test_class)
         add_groups_to_test_class(class_header, new_test_class)
-        progress_bar.progress_bar_current_val += 1
-        progress_bar.save()
+        progress_bar.increase()
+    progress_bar.clear()
     print(">>>>> All instances created")
 
 

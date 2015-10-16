@@ -32,12 +32,14 @@ def get_new_trunk_build_results_from_jenkins():
 
 
 def get_build_results_from_jenkins(job_jenkins_page):
-    print(" > Lets get " + job_jenkins_page + " build results from uncle Jenkins")
+    job_objects = Job.objects.filter(job_jenkins_page=job_jenkins_page)
+    progress_bar = init_progress_bar(len(job_objects))
+    print("Getting " + job_jenkins_page + " build results from Jenkins")
     server = get_server_instance()
     firefox_profile = webdriver.FirefoxProfile(LOCAL_FIREFOX_PROFILE)
     driver = webdriver.Firefox(firefox_profile)
     driver.implicitly_wait(10)
-    for job in Job.objects.filter(job_jenkins_page=job_jenkins_page):
+    for job in job_objects:
         job_inst = server.get_job(job.job_name)
         # getting builds for job
         builds_dict = job_inst.get_build_dict()
@@ -54,10 +56,12 @@ def get_build_results_from_jenkins(job_jenkins_page):
                 build_date = build_inst.get_timestamp().strftime('%d.%m.%Y %H:%M')
                 new_build = create_new_build(job,
                                              build_number,
-                                             builds_dict.get(build_number) + BUILD_RESULTS_REPORT_LINK,
+                                             builds_dict.get(build_number) + BUILD_RESULTS_REPORT_LINK_SHORT,
                                              build_date,
                                              build_run_time)
                 process_report(job_jenkins_page, new_build, driver.page_source)
+        progress_bar.increase()
+    progress_bar.clear()
 
 
 def process_report(job_jenkins_page, new_build, html_report):
@@ -131,6 +135,9 @@ def get_new_trunk_job_configs_from_jenkins():
 
 
 def add_config_data_to_jobs(job_jenkins_page):
+    print("Getting " + job_jenkins_page + " jobs configs from Jenkins")
+    job_objects = Job.objects.filter(job_jenkins_page=job_jenkins_page)
+    progress_bar = init_progress_bar(len(job_objects))
     # setting webdriver to parse Jenkins
     firefox_profile = webdriver.FirefoxProfile(LOCAL_FIREFOX_PROFILE)
     driver = webdriver.Firefox(firefox_profile)
@@ -141,7 +148,7 @@ def add_config_data_to_jobs(job_jenkins_page):
     driver.find_element_by_name("j_password").send_keys(PASSWORD)
     driver.find_element_by_name("Submit").click()
     # getting config files
-    for job in Job.objects.filter(job_jenkins_page=job_jenkins_page):
+    for job in job_objects:
         driver.get(job.job_link + CONFIG_FILE)
         config_xml = driver.page_source
         # getting data from xml
@@ -171,7 +178,9 @@ def add_config_data_to_jobs(job_jenkins_page):
                     logger.info("Created job from ALL jenkins page - " + up_stream_job.job_name)
                     job.job_up_stream = up_stream_job
         job.save()
+        progress_bar.increase()
     driver.quit()
+    progress_bar.clear()
 
 
 def get_data_from_job_config(job_name, config_xml):
@@ -217,16 +226,18 @@ def get_new_trunk_jobs_from_jenkins():
 
 
 def get_jobs_from_jenkins(view_url, excluded_jobs, job_jenkins_page):
-    print(" > Lets get " + job_jenkins_page + " jobs from uncle Jenkins")
+    print("Getting " + job_jenkins_page + " jobs from Jenkins")
     server = get_server_instance()
     # opening acceptance view
     view = server.get_view_by_url(view_url)
     # getting all jobs from view
     jobs_dict = view.get_job_dict()
-    print(" >> We have - " + str(len(jobs_dict) - len(excluded_jobs)) + " jobs in " + job_jenkins_page)
+    progress_bar = init_progress_bar(len(jobs_dict))
     for job_title, job_link in jobs_dict.items():
         # filtering jobs
         if job_title not in excluded_jobs:
             job_inst = server.get_job(job_title)
             # creating new job
             create_new_job(job_title, job_link, job_jenkins_page, job_inst.is_enabled())
+        progress_bar.increase()
+    progress_bar.clear()

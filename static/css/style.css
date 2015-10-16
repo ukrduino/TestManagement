@@ -30,3 +30,16 @@
     width: 40px;
     text-align: left;
 }
+
+.panel-footer{
+    background-color: transparent
+}
+
+body{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+

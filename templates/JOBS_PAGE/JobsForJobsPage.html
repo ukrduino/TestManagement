@@ -21,10 +21,10 @@
                     <p data-toggle="tooltip" data-placement="top" title="{{ build.build_date }}">
                         {% if build.build_successful %}
                             <a class="text-success"
-                               href="{{ build.build_link }} target=_blank">{{ build.build_number }}</a>
+                               href="{{ build.build_link }}" target=_blank>{{ build.build_number }}</a>
                         {% else %}
                             <a class="text-danger"
-                               href="{{ build.build_link }} target=_blank">{{ build.build_number }}</a>
+                               href="{{ build.build_link }}" target=_blank>{{ build.build_number }}</a>
                         {% endif %}
                     </p>
                     <span class="label label-default">{{ build.build_app_ver }}</span>

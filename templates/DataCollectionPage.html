@@ -10,39 +10,37 @@
                 <h3 class="panel-title" style="text-align: center">START ACTIONS</h3>
             </div>
             <div class="panel-body">
-                <div class="btn-group btn-group-justified" role="group" aria-label="">
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-default" id="parse_java">Parse java code</a>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-default" id="save_instances">Save instances to DB</a>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-default" id="get_builds_info_from_jenkins">...........</a>
-                    </div>
+                <div class="col-lg-4">
+                    <a class="btn btn-default btn-group-justified" id="parse_java">Parse java code</a>
+                </div>
+                <div class="col-lg-4">
+                    <a class="btn btn-default btn-group-justified" id="save_instances">Save instances to DB</a>
+                    <div class="progressDiv" id="save_instances_progress"></div>
+                </div>
+                <div class="col-lg-4">
+                    <a class="btn btn-default btn-group-justified" id="get_builds_info_from_jenkins">...........</a>
                 </div>
             </div>
-            <div id="progressDiv"></div>
         </div>
         <div class="panel panel-info">
             <div class="panel-heading">
                 <h3 class="panel-title" style="text-align: center">ACCEPTANCE</h3>
             </div>
             <div class="panel-body">
-                <div class="btn-group btn-group-justified" role="group" aria-label="">
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-default get_jobs" data-jenkins_page="Acceptance">Get jobs from
-                            Jenkins</a>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-default get_jobs_configs" data-jenkins_page="Acceptance">Get jobs configs from
-                            Jenkins</a>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default get_builds_and_save_results"
-                                data-jenkins_page="Acceptance">Get builds from Jenkins
-                        </button>
-                    </div>
+                <div class="col-lg-4">
+                    <a class="btn btn-default btn-group-justified get_jobs" data-jenkins_page="Acceptance">Get jobs from Jenkins</a>
+                    <div class="progressDiv" id="get_jobs_acceptance_progress"></div>
+                </div>
+                <div class="col-lg-4">
+                    <a class="btn btn-default btn-group-justified get_jobs_configs" data-jenkins_page="Acceptance">Get jobs configs from
+                        Jenkins</a>
+                    <div class="progressDiv" id="get_jobs_configs_acceptance_progress"></div>
+                </div>
+                <div class="col-lg-4">
+                    <a class="btn btn-default btn-group-justified get_builds_and_save_results"
+                            data-jenkins_page="Acceptance">Get builds from Jenkins
+                    </a>
+                    <div class="progressDiv" id="get_builds_and_save_results_acceptance_progress"></div>
                 </div>
             </div>
         </div>
@@ -51,27 +49,52 @@
                 <h3 class="panel-title" style="text-align: center">TRUNK</h3>
             </div>
             <div class="panel-body">
-                <div class="btn-group btn-group-justified" role="group" aria-label="">
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-default get_jobs" data-jenkins_page="Trunk">Get jobs from
-                            Jenkins</a>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-default get_jobs_configs" data-jenkins_page="Trunk">Get jobs configs from
-                            Jenkins</a>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default get_builds_and_save_results"
-                                data-jenkins_page="Trunk">Get builds from Jenkins
-                        </button>
-                    </div>
+                <div class="col-lg-4">
+                    <a class="btn btn-default btn-group-justified get_jobs" data-jenkins_page="Trunk">Get jobs from Jenkins</a>
+                    <div class="progressDiv" id="get_jobs_trunk_progress"></div>
+                </div>
+                <div class="col-lg-4">
+                    <a class="btn btn-default btn-group-justified get_jobs_configs" data-jenkins_page="Trunk">Get jobs configs from
+                        Jenkins</a>
+                    <div class="progressDiv" id="get_jobs_configs_trunk_progress"></div>
+                </div>
+                <div class="col-lg-4">
+                    <a class="btn btn-default btn-group-justified get_builds_and_save_results"
+                            data-jenkins_page="Trunk">Get builds from Jenkins
+                    </a>
+                    <div class="progressDiv" id="get_builds_and_save_results_trunk_progress"></div>
+                </div>
+            </div>
+        </div>
+                <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title" style="text-align: center">NEW TRUNK</h3>
+            </div>
+            <div class="panel-body">
+                <div class="col-lg-4">
+                    <a class="btn btn-default btn-group-justified get_jobs" data-jenkins_page="New trunk">Get jobs from Jenkins</a>
+                    <div class="progressDiv" id="get_jobs_new_trunk_progress"></div>
+                </div>
+                <div class="col-lg-4">
+                    <a class="btn btn-default btn-group-justified get_jobs_configs" data-jenkins_page="New trunk">Get jobs configs from
+                        Jenkins</a>
+                    <div class="progressDiv" id="get_jobs_configs_new_trunk_progress"></div>
+                </div>
+                <div class="col-lg-4">
+                    <a class="btn btn-default btn-group-justified get_builds_and_save_results"
+                            data-jenkins_page="New trunk">Get builds from Jenkins
+                    </a>
+                    <div class="progressDiv" id="get_builds_and_save_results_new_trunk_progress"></div>
                 </div>
             </div>
         </div>
         <div>
-            <button class="btn btn-danger delete" style="margin-left: 50px" data-delete="all tests">DELETE ALL TESTS</button>
-            <button class="btn btn-danger delete" style="margin-left: 50px" data-delete="all groups">DELETE ALL GROUPS</button>
-            <button class="btn btn-danger delete" style="margin-left: 50px" data-delete="all jobs">DELETE ALL JOBS</button>
+            <button class="btn btn-danger delete" style="margin-left: 50px" data-delete="all tests">DELETE ALL TESTS
+            </button>
+            <button class="btn btn-danger delete" style="margin-left: 50px" data-delete="all groups">DELETE ALL GROUPS
+            </button>
+            <button class="btn btn-danger delete" style="margin-left: 50px" data-delete="all jobs">DELETE ALL JOBS
+            </button>
             <button class="btn btn-danger delete" style="margin-left: 50px" data-delete="all builds and results">DELETE
                 ALL BUILDS RESULTS
             </button>

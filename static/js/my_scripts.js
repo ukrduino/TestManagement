@@ -12,14 +12,15 @@ $('#parse_java').click(function (event) {
 
 $('#save_instances').click(function (event) {
     event.preventDefault();
-    show_progress_bar();
+    show_progress_bar('#save_instances_progress');
     setTimeout(update_progress_bar, 5000);
     $.ajax({
         url: 'save_instances/',
         type: 'get',
         success: function () {
+            update_progress_bar();
+            alert("Successfully saved test classes and test cases!!!");
             destroy_progress_bar();
-            alert("Successfully saved test classes and test cases!!!")
         }
     });
 });
@@ -27,15 +28,27 @@ $('#save_instances').click(function (event) {
 $('.get_jobs').click(function (event) {
     event.preventDefault();
     var jenkins_page = $(this).attr("data-jenkins_page");
+    if (jenkins_page == "Acceptance"){
+        show_progress_bar('#get_jobs_acceptance_progress');
+    }
+    if (jenkins_page == "Trunk"){
+        show_progress_bar('#get_jobs_trunk_progress');
+    }
+    if (jenkins_page == "New trunk"){
+        show_progress_bar('#get_jobs_new_trunk_progress');
+    }
+    setTimeout(update_progress_bar, 5000);
     $.ajax({
+        type: 'post',
         url: 'get_jobs/',
         data: {
             'jenkins_page': jenkins_page,
             'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
         },
-        type: 'POST',
         success: function () {
-            alert("Successfully !!!");
+            update_progress_bar();
+            alert("Successfully saved jobs from " + jenkins_page + " page!!!");
+            destroy_progress_bar();
         }
     });
 });
@@ -43,15 +56,29 @@ $('.get_jobs').click(function (event) {
 $('.get_jobs_configs').click(function (event) {
     event.preventDefault();
     var jenkins_page = $(this).attr("data-jenkins_page");
+    if (jenkins_page == "Acceptance"){
+        show_progress_bar('#get_jobs_configs_acceptance_progress');
+    }
+    if (jenkins_page == "Trunk"){
+        show_progress_bar('#get_jobs_configs_trunk_progress');
+    }
+    if (jenkins_page == "New trunk"){
+        show_progress_bar('#get_jobs_configs_new_trunk_progress');
+    }
+    setTimeout(update_progress_bar, 5000);
+    displayOverlay("Saving jobs configs from " + jenkins_page + " page");
     $.ajax({
+        type: 'post',
         url: 'get_jobs_configs/',
         data: {
             'jenkins_page': jenkins_page,
             'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
         },
-        type: 'POST',
         success: function () {
-            alert("Successfully !!!");
+            removeOverlay();
+            update_progress_bar();
+            alert("Successfully saved jobs configs from " + jenkins_page + " page!!!");
+            destroy_progress_bar();
         }
     });
 });
@@ -59,15 +86,26 @@ $('.get_jobs_configs').click(function (event) {
 $('.get_builds_and_save_results').click(function (event) {
     event.preventDefault();
     var jenkins_page = $(this).attr("data-jenkins_page");
+    if (jenkins_page == "Acceptance"){
+        show_progress_bar('#get_builds_and_save_results_acceptance_progress');
+    }
+    if (jenkins_page == "Trunk"){
+        show_progress_bar('#get_builds_and_save_results_trunk_progress');
+    }
+    if (jenkins_page == "New trunk"){
+        show_progress_bar('#get_builds_and_save_results_new_trunk_progress');
+    }
+    setTimeout(update_progress_bar, 5000);
     $.ajax({
+        type: 'post',
         url: 'get_builds_and_save_results/',
         data: {
             'jenkins_page': jenkins_page,
             'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
         },
-        type: 'POST',
         success: function () {
-            alert("Successfully !!!");
+            alert("Successfully saved build results for jobs from " + jenkins_page + " page!!!");
+            destroy_progress_bar();
         }
     });
 });
@@ -76,12 +114,12 @@ $('.delete').click(function (event) {
     event.preventDefault();
     var object_to_delete = $(this).attr("data-delete");
     $.ajax({
+        type: 'post',
         url: 'delete/',
         data: {
             'object_to_delete': object_to_delete,
             'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
         },
-        type: 'POST',
         success: function () {
             alert("Successfully deleted " + object_to_delete);
         }
@@ -128,7 +166,10 @@ function show_jobs_results_in_template(data) {
 function tests_for_job(data) {
     $('#' + job_id).html(data);
     $('img#loader' + job_id).toggle();
-    $('button#showButton' + job_id).show();
+    $('button#showButton' + job_id).show().click(function () {
+        job_id = $(this).attr("data-job_id");
+        $('#' + job_id).toggle();
+    });
     $('button#loadButton' + job_id).hide();
 }
 
@@ -137,12 +178,6 @@ $('#myModal').on('show.bs.modal', function (e) {
     $(e.currentTarget).find('pre.stack_trace').text(stack_trace)
 });
 
-$(function () {
-    $('button:contains("HIDE/SHOW")').click(function () {
-        job_id = $(this).attr("data-job_id");
-        $('#' + job_id).toggle();
-    });
-});
 
 // SEARCH JOB PAGE
 $('#job_search_by_groups_input').keyup(function () {
@@ -212,16 +247,18 @@ function show_jobs_configs(data) {
     $('#jobs_configs_in_template').html(data);
 }
 
-function show_progress_bar() {
-    $('#progressDiv').html('' +
+function show_progress_bar(progress_bar) {
+    $(progress_bar).html('' +
         '<div class="panel-footer">' +
-        '<div class="progress progress-striped active">' +
+        '<div class="progress progress-striped">' +
         '<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>' +
         '</div>');
 }
 
 function destroy_progress_bar() {
-    $('#progressDiv').html("");
+    $('.progressDiv').each(function() {
+        $(this).html("");
+    });
 }
 
 //http://stackoverflow.com/a/5109076
@@ -237,19 +274,39 @@ function update_progress_bar() {
         success: function (resp) {
             console.info("Ajax Response is there.....");
             console.log(resp);
-            var current_perc = resp.current_val / resp.max_val * 100
-            if (current_perc < 100) {
+            var current_perc = resp.current_val / resp.max_val * 100;
+            if (current_perc <= 100) {
                 //http://stackoverflow.com/a/21182722
                 $('.progress-bar').css('width', current_perc + '%').attr('aria-valuenow', current_perc);
                 //http://stackoverflow.com/a/5052606
                 setTimeout(update_progress_bar, 5000)
-            }
-            else {
-                destroy_progress_bar()
             }
         },
         error: function () {
             update_progress_bar();
         }
     });
+}
+
+//http://stackoverflow.com/a/25187060
+function displayOverlay(text) {
+    $("<table id='overlay'><tbody><tr><td>" + text + "</td></tr></tbody></table>").css({
+        "position": "fixed",
+        "top": "0px",
+        "left": "0px",
+        "width": "100%",
+        "height": "100%",
+        "background-color": "rgba(0,0,0,.5)",
+        "z-index": "10000",
+        "vertical-align": "middle",
+        "text-align": "center",
+        "color": "#fff",
+        "font-size": "40px",
+        "font-weight": "bold",
+        "cursor": "wait"
+    }).appendTo("body");
+}
+
+function removeOverlay() {
+    $("#overlay").remove();
 }

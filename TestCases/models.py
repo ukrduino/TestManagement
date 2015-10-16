@@ -93,8 +93,7 @@ class TestClass(models.Model):
     test_class_group = models.ManyToManyField(TestGroup)
     test_class_build = models.ForeignKey(JobBuild, null=True)
     test_class_enabled = models.BooleanField(default=True)
-    test_class_blocked_by_ticket = models.CharField(verbose_name="Test class blocked by ticket", max_length=200, blank=True)
-    test_class_comment = models.TextField(verbose_name="Test class comment",  blank=True)  # TODO implement adding comment from template with modal form
+    test_class_comment = models.TextField(verbose_name="Test class comment",  blank=True)
 
     def __str__(self):
         return self.test_class_name
@@ -168,18 +167,28 @@ class ProgressBar(models.Model):
         db_table = 'progress_bar'
         verbose_name = 'Progress bar data'
 
+    def increase(self):
+        self.progress_bar_current_val += 1
+        self.save()
+
+    def clear(self):
+        self.progress_bar_current_val = 0
+        self.progress_bar_max_val = 0
+        self.save()
+
     progress_bar_max_val = models.IntegerField(verbose_name="Max value of progress bar", default=0)
     progress_bar_current_val = models.IntegerField(verbose_name="Current value of progress bar", default=0)
 
 
-def init_progress_bar():
+def init_progress_bar(max_value):
     if not ProgressBar.objects.all():
         progress_bar = ProgressBar()
+        progress_bar.progress_bar_max_val = max_value
         progress_bar.save()
         return progress_bar
     else:
         progress_bar = ProgressBar.objects.last()
-        progress_bar.progress_bar_max_val = 0
+        progress_bar.progress_bar_max_val = max_value
         progress_bar.progress_bar_current_val = 0
         progress_bar.save()
         return progress_bar

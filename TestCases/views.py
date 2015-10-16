@@ -220,10 +220,10 @@ def show_all_test_cases(request):
                               args,
                               context_instance=RequestContext(request))
 
+
 # http://stackoverflow.com/a/32466453
 def update_progress_bar(request):
     if request.method == 'POST':
-        print(request.POST['process'])
         progress_bar = ProgressBar.objects.last()
         resp = {'current_val': progress_bar.progress_bar_current_val,
                 'max_val': progress_bar.progress_bar_max_val,
