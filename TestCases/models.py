@@ -11,7 +11,7 @@ class Job(models.Model):
         verbose_name = 'Jenkins job'
         verbose_name_plural = 'Jenkins jobs'
 
-    job_name = models.CharField(verbose_name="Job name", max_length=200)
+    job_name = models.CharField(verbose_name="Job name", max_length=200, unique=True)
     job_env = models.CharField(verbose_name="Job environment", max_length=200, null=True)  # TODO get from Job's XML
     job_description = models.CharField(verbose_name="Job description", max_length=200, null=True)
     job_assigned_node = models.CharField(verbose_name="Job assigned node", max_length=200, null=True)  # TODO get from Job's XML
@@ -42,7 +42,7 @@ class JobBuild(models.Model):
         verbose_name_plural = 'Job builds'
 
     job = models.ForeignKey(Job)
-    build_number = models.IntegerField(verbose_name="Number of build")
+    build_number = models.IntegerField(verbose_name="Build number")
     build_app_ver = models.CharField(verbose_name="Version of App", max_length=200, blank=True)
     build_date = models.CharField(verbose_name="Date of build", max_length=200, blank=True)
     build_link = models.CharField(verbose_name="Build link", max_length=200, blank=True)
@@ -73,8 +73,9 @@ class TestGroup(models.Model):
         verbose_name = 'Test group'
         verbose_name_plural = 'Test groups'
 
-    test_group_name = models.CharField(verbose_name="Test group name", max_length=200)
-    job = models.ForeignKey(Job, null=True)
+    test_group_name = models.CharField(verbose_name="Test group name", max_length=200, unique=True)
+    job = models.ManyToManyField(Job)
+    jobs_number = models.IntegerField(verbose_name="Number of jobs", default=0)
 
     def __str__(self):
         return self.test_group_name

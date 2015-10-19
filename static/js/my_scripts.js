@@ -14,11 +14,13 @@ $('#save_instances').click(function (event) {
     event.preventDefault();
     show_progress_bar('#save_instances_progress');
     setTimeout(update_progress_bar, 5000);
+    displayOverlay("Saving test classes and test cases to DB");
     $.ajax({
         url: 'save_instances/',
         type: 'get',
         success: function () {
-            update_progress_bar();
+            update_progress_bar_to_full();
+            removeOverlay()
             alert("Successfully saved test classes and test cases!!!");
             destroy_progress_bar();
         }
@@ -37,7 +39,11 @@ $('.get_jobs').click(function (event) {
     if (jenkins_page == "New trunk"){
         show_progress_bar('#get_jobs_new_trunk_progress');
     }
+    if (jenkins_page == "All other"){
+        show_progress_bar('#get_jobs_all_other_progress');
+    }
     setTimeout(update_progress_bar, 5000);
+    displayOverlay("Saving jobs from " + jenkins_page + " page");
     $.ajax({
         type: 'post',
         url: 'get_jobs/',
@@ -46,7 +52,8 @@ $('.get_jobs').click(function (event) {
             'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
         },
         success: function () {
-            update_progress_bar();
+            update_progress_bar_to_full();
+            removeOverlay()
             alert("Successfully saved jobs from " + jenkins_page + " page!!!");
             destroy_progress_bar();
         }
@@ -75,8 +82,8 @@ $('.get_jobs_configs').click(function (event) {
             'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
         },
         success: function () {
+            update_progress_bar_to_full();
             removeOverlay();
-            update_progress_bar();
             alert("Successfully saved jobs configs from " + jenkins_page + " page!!!");
             destroy_progress_bar();
         }
@@ -96,6 +103,7 @@ $('.get_builds_and_save_results').click(function (event) {
         show_progress_bar('#get_builds_and_save_results_new_trunk_progress');
     }
     setTimeout(update_progress_bar, 5000);
+    displayOverlay("Saving build results for jobs from " + jenkins_page + " page");
     $.ajax({
         type: 'post',
         url: 'get_builds_and_save_results/',
@@ -104,6 +112,8 @@ $('.get_builds_and_save_results').click(function (event) {
             'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
         },
         success: function () {
+            update_progress_bar_to_full()
+            removeOverlay();
             alert("Successfully saved build results for jobs from " + jenkins_page + " page!!!");
             destroy_progress_bar();
         }
@@ -287,7 +297,9 @@ function update_progress_bar() {
         }
     });
 }
-
+function update_progress_bar_to_full() {
+    $('.progress-bar').css('width', 100 + '%').attr('aria-valuenow', 100);
+}
 //http://stackoverflow.com/a/25187060
 function displayOverlay(text) {
     $("<table id='overlay'><tbody><tr><td>" + text + "</td></tr></tbody></table>").css({

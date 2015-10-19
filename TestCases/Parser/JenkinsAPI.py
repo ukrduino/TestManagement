@@ -5,6 +5,7 @@ from jenkinsapi.jenkins import Jenkins
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import untangle
+
 from untangle import Element
 
 from TestManagement.local_settings import *
@@ -62,6 +63,7 @@ def get_build_results_from_jenkins(job_jenkins_page):
                 process_report(job_jenkins_page, new_build, driver.page_source)
         progress_bar.increase()
     progress_bar.clear()
+    driver.quit()
 
 
 def process_report(job_jenkins_page, new_build, html_report):
@@ -161,7 +163,7 @@ def add_config_data_to_jobs(job_jenkins_page):
                     new_group.test_group_name = group_name
                     new_group.save()
                 group_from_db = TestGroup.objects.get(test_group_name=group_name)
-                group_from_db.job = job
+                group_from_db.job.add(job)
                 group_from_db.save()
         # saving shell command
         job.job_hudson_shell_command = config_data_dict["shell_command"]
@@ -173,7 +175,7 @@ def add_config_data_to_jobs(job_jenkins_page):
                     up_stream_job = Job.objects.get(job_name=up_stream_job_name)
                     job.job_up_stream = up_stream_job
                 else:
-                    up_stream_job = Job(job_name=up_stream_job_name, job_jenkins_page=ALL_JOBS)
+                    up_stream_job = Job(job_name=up_stream_job_name, job_jenkins_page=ALL_OTHER)
                     up_stream_job.save()
                     logger.info("Created job from ALL jenkins page - " + up_stream_job.job_name)
                     job.job_up_stream = up_stream_job
@@ -225,6 +227,10 @@ def get_new_trunk_jobs_from_jenkins():
     get_jobs_from_jenkins(NEW_TRUNK_URL, EXCLUDED_NEW_TRUNK_JOBS, NEW_TRUNK)
 
 
+def get_all_other_jobs_from_jenkins():
+    get_jobs_from_jenkins(ALL_OTHER_URL, EXCLUDED_ALL_OTHER_JOBS, ALL_OTHER)
+
+
 def get_jobs_from_jenkins(view_url, excluded_jobs, job_jenkins_page):
     print("Getting " + job_jenkins_page + " jobs from Jenkins")
     server = get_server_instance()
@@ -234,10 +240,18 @@ def get_jobs_from_jenkins(view_url, excluded_jobs, job_jenkins_page):
     jobs_dict = view.get_job_dict()
     progress_bar = init_progress_bar(len(jobs_dict))
     for job_title, job_link in jobs_dict.items():
-        # filtering jobs
-        if job_title not in excluded_jobs:
-            job_inst = server.get_job(job_title)
-            # creating new job
-            create_new_job(job_title, job_link, job_jenkins_page, job_inst.is_enabled())
+        jobs_with_the_same_title = Job.objects.filter(job_name=job_title)
+        # filtering jobs by duplicates
+        if jobs_with_the_same_title:
+            logger.info(">>> Job with such title is already created")
+            for job in jobs_with_the_same_title:
+                logger.info(">>>>> " + str(job.id) + " " + job.job_name + " " + job.job_jenkins_page)
+            logger.info("Job was not created")
+        else:
+            # filtering jobs by excluded list
+            if job_title not in excluded_jobs:
+                job_inst = server.get_job(job_title)
+                # creating new job
+                create_new_job(job_title, job_link, job_jenkins_page, job_inst.is_enabled())
         progress_bar.increase()
     progress_bar.clear()

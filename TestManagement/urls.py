@@ -29,4 +29,5 @@ urlpatterns = [
     url(r'^jobs_results/load_data/$', 'TestCases.views.show_test_for_jobs'),
 
     url(r'^all_test_cases/$', 'TestCases.views.show_all_test_cases', name="show_all_test_cases"),
+    url(r'^groups/$', 'TestCases.views.groups_page', name="groups_page"),
 ]

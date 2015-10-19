@@ -21,29 +21,47 @@
 </head>
 
 <body>
-<div class="container" id="main">
-    <div class="row">
-        <ul class="nav nav-pills">
-            <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="{% url 'jobs_results_page' %}">JOBS</a></li>
-            <li><a href="{% url 'search_jobs' %}">JOBS SEARCH</a></li>
-            <li><a href="{% url 'jobs_configs' %}">JOBS CONFIGS</a></li>
-            <li><a href="{% url 'show_all_test_cases' %}">TEST CLASSES</a></li>
-            <li><a href="{% url 'data_collection' %}">Data collection</a></li>
-        </ul>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container" id="main">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{% url 'home' %}">INFO</a>
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle HeaderPanelText" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">JOBS<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'jobs_results_page' %}">JOBS RESULTS</a></li>
+                        <li><a href="{% url 'search_jobs' %}">JOBS SEARCH</a></li>
+                        <li><a href="{% url 'jobs_configs' %}">JOBS CONFIGS</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle HeaderPanelText" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">TESTS<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'show_all_test_cases' %}">TEST CLASSES</a></li>
+                    </ul>
+                </li>
+                <li><a class="HeaderPanelText" href="{% url 'groups_page' %}">GROUPS</a></li>
+                <li><a class="HeaderPanelText" href="{% url 'data_collection' %}">DATA COLLECTION</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="row page_content">
+    <div class="col-lg-10 col-lg-offset-1">
         {% block search_jobs_page %}{% endblock %}
         {% block acceptance_jobs_page %}{% endblock %}
         {% block home_page %}{% endblock %}
         {% block test_cases_page %}{% endblock %}
         {% block data_collection_page %}{% endblock %}
         {% block jobs_configs_page %}{% endblock %}
+        {% block groups_page %}{% endblock %}
     </div>
 </div>
-<div class="bottom_buffer"></div>
+<div id="bottom_buffer"></div>
 <nav class="navbar navbar-default navbar-fixed-bottom">
-    <div class="container">
-        <p id="bottomText">Made by Romanyuk Sergey - 2015</p>
-    </div>
+    <p id="bottomText">Made by Romanyuk Sergey - 2015</p>
 </nav>
 
 <!-- Bootstrap core JavaScript

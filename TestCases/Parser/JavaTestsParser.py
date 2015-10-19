@@ -49,23 +49,16 @@ def create_instances_and_put_to_db():
         new_test_class.save()
         # searching if test class enabled
         enabled_search_result = re.findall("enabled(.+?),", class_header)
-        for is_enabled in enabled_search_result:
-            enabled = is_enabled.replace(" ", "").replace("=", "")
-            if enabled == "false":
-                new_test_class.test_class_enabled = False
-                comment_search_result = re.findall("//(.+?)description", class_header)
-                if len(comment_search_result) > 0:
-                    for comment in comment_search_result:
-                        new_test_class.test_class_comment = comment
-                blocked_by_ticket_search_result = re.findall("#([0-9]+)description", class_header)
-                if len(blocked_by_ticket_search_result) > 0:
-                    if len(blocked_by_ticket_search_result) == 1:
-                        for ticket in blocked_by_ticket_search_result:
-                            new_test_class.test_class_blocked_by_ticket = ticket
-                    else:
-                        blocked_by_ticket = ",".join(blocked_by_ticket_search_result)
-                        new_test_class.test_class_blocked_by_ticket = blocked_by_ticket
-            new_test_class.save()
+        if len(enabled_search_result) > 0:
+            for is_enabled in enabled_search_result:
+                enabled = is_enabled.replace(" ", "").replace("=", "")
+                if enabled == "false":
+                    new_test_class.test_class_enabled = False
+                    comment_search_result = re.findall("//(.+?)description", class_header)
+                    if len(comment_search_result) > 0:
+                        for comment in comment_search_result:
+                            new_test_class.test_class_comment = comment
+                new_test_class.save()
         # searching test groups in class headers
         add_test_cases_to_test_class(class_header, new_test_class)
         add_groups_to_test_class(class_header, new_test_class)
@@ -82,14 +75,14 @@ def add_groups_to_test_class(class_header, new_test_class):
             result1 = groups.replace("\"", "").replace(",", "")
             # creating list of groups for this test class
             groups_in_test_list = result1.split()
-            for grop_name in groups_in_test_list:
+            for group_name in groups_in_test_list:
                 # saving test group to db if its not saved before
-                if not TestGroup.objects.filter(test_group_name=grop_name):
+                if not TestGroup.objects.filter(test_group_name=group_name):
                     new_group = TestGroup()
-                    new_group.test_group_name = grop_name
+                    new_group.test_group_name = group_name
                     new_group.save()
-            for grop_name in groups_in_test_list:
-                group = TestGroup.objects.get(test_group_name=grop_name)
+            for group_name in groups_in_test_list:
+                group = TestGroup.objects.get(test_group_name=group_name)
                 new_test_class.test_class_group.add(group)
 
 
