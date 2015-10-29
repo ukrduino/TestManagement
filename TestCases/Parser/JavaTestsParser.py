@@ -1,5 +1,6 @@
 import codecs
 import re
+import os
 
 from TestCases.models import *
 from TestManagement.local_settings import *
@@ -35,14 +36,14 @@ def get_tests_headers_from_java_code():
 
 
 def create_instances_and_put_to_db():
-    my_file = codecs.open(result_file_path, "r", "cp1250")
-    data = my_file.readlines()
+    result_file = codecs.open(result_file_path, "r", "cp1250")
+    data = result_file.readlines()
     progress_bar = init_progress_bar(len(data))
     for class_header in data:
         # creating new instance of TestClass
         new_test_class = TestClass()
-        # searching test class name in class headers
-        test_class_name_search_result = re.findall("public void (.+?)\\n", class_header)  # TODO Some shit at the end of class name
+        # searching test class name in class headers  # TODO Some shit at the end of class name
+        test_class_name_search_result = re.findall("public void (.+?)\\n", class_header)  #
         for name in test_class_name_search_result:
             new_test_class.test_class_name = name.replace(" ", "").replace('\n', '').replace('\t', ' ')
         # saving TestClass with name only
@@ -64,6 +65,8 @@ def create_instances_and_put_to_db():
         add_groups_to_test_class(class_header, new_test_class)
         progress_bar.increase()
     progress_bar.clear()
+    result_file.close()
+    os.remove(result_file_path)
     print(">>>>> All instances created")
 
 

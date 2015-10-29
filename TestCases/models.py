@@ -13,7 +13,7 @@ class Job(models.Model):
 
     job_name = models.CharField(verbose_name="Job name", max_length=200, unique=True)
     job_env = models.CharField(verbose_name="Job environment", max_length=200, null=True)  # TODO get from Job's XML
-    job_description = models.CharField(verbose_name="Job description", max_length=200, null=True)
+    job_description = models.TextField(verbose_name="Job description", null=True)
     job_assigned_node = models.CharField(verbose_name="Job assigned node", max_length=200, null=True)  # TODO get from Job's XML
     job_link = models.CharField(verbose_name="Job link", max_length=200, null=True)
     job_jenkins_page = models.CharField(verbose_name="Jenkins page", max_length=200, null=True)
@@ -195,6 +195,46 @@ def init_progress_bar(max_value):
         return progress_bar
 
 
+class DataCollectionTimeStamps(models.Model):
+
+    class Meta:
+        db_table = 'data_collection_time_stamps'
+        verbose_name = 'Data collection time stamps'
+
+    parse_java_code = models.DateTimeField(verbose_name="Parse java code", null=True, default=None)
+    save_instances_to_db = models.DateTimeField(verbose_name="Save instances to DB", null=True, default=None)
+
+    get_jobs_acceptance = models.DateTimeField(verbose_name="Get Acceptance jobs from Jenkins", null=True, default=None)
+    get_jobs_trunk = models.DateTimeField(verbose_name="Get Trunk jobs from Jenkins", null=True, default=None)
+    get_jobs_new_trunk = models.DateTimeField(verbose_name="Get New Trunk jobs from Jenkins", null=True, default=None)
+    get_jobs_all_other = models.DateTimeField(verbose_name="Get All Other jobs from Jenkins", null=True, default=None)
+
+    get_jobs_configs_acceptance = models.DateTimeField(verbose_name="Get Acceptance jobs configs from Jenkins", null=True, default=None)
+    get_jobs_configs_trunk = models.DateTimeField(verbose_name="Get Trunk jobs configs from Jenkins", null=True, default=None)
+    get_jobs_configs_new_trunk = models.DateTimeField(verbose_name="Get New Trunk jobs configs from Jenkins", null=True, default=None)
+    get_jobs_configs_all_other = models.DateTimeField(verbose_name="Get All Other jobs configs from "
+                                                                                "Jenkins", null=True, default=None)
+    get_builds_and_save_results_acceptance = models.DateTimeField(verbose_name="Get Acceptance builds from Jenkins", null=True, default=None)
+    get_builds_and_save_results_trunk = models.DateTimeField(verbose_name="Get Trunk builds from Jenkins", null=True, default=None)
+    get_builds_and_save_results_new_trunk = models.DateTimeField(verbose_name="Get New Trunk builds from Jenkins", null=True, default=None)
+
+    def reset_data(self):
+        for field in self._meta.fields:
+            if field not in ['id', '_state']:
+                if not field.blank or field.has_default():
+                    setattr(self, field.name, field.get_default())
+        self.save()
+
+
+def init_data_collection_time_stamps_clear(clear=False):
+    if not DataCollectionTimeStamps.objects.all():
+        return DataCollectionTimeStamps()
+    else:
+        time_stamp = DataCollectionTimeStamps.objects.last()
+        if clear:
+            time_stamp.reset_data()
+
+        return time_stamp
 
 
 # Making migrations

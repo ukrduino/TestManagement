@@ -57,3 +57,8 @@ body{
   font-size: 16px;
   color: inherit;
 }
+
+.updateTimeStamp{
+    margin-left: 5px !important;
+    background-color: deepskyblue;
+}

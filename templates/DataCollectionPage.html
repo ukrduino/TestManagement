@@ -11,12 +11,14 @@
             </div>
             <div class="panel-body">
                 <div class="col-lg-4">
-                    <a class="btn btn-default btn-group-justified" id="parse_java">Parse java code</a>
+                    <a class="btn btn-default btn-group-justified" id="parse_java_code">Parse java code<span
+                            class="badge updateTimeStamp"></span></a>
                 </div>
                 <div class="col-lg-4">
-                    <a class="btn btn-default btn-group-justified" id="save_instances">Save instances to DB</a>
+                    <a class="btn btn-default btn-group-justified" id="save_instances_to_db">Save instances to DB<span
+                            class="badge updateTimeStamp"></span></a>
 
-                    <div class="progressDiv" id="save_instances_progress"></div>
+                    <div class="progressDiv" id="save_instances_to_db_progress"></div>
                 </div>
                 <div class="col-lg-4">
                     <a class="btn btn-default btn-group-justified" id="get_builds_info_from_jenkins">...........</a>
@@ -29,23 +31,21 @@
             </div>
             <div class="panel-body">
                 <div class="col-lg-4">
-                    <a class="btn btn-default btn-group-justified get_jobs" data-jenkins_page="Acceptance">Get jobs from
-                        Jenkins</a>
+                    <a class="btn btn-default btn-group-justified get_jobs" data-jenkins_page="Acceptance"
+                       id="get_jobs_acceptance">Get jobs from Jenkins<span class="badge updateTimeStamp"></span></a>
 
                     <div class="progressDiv" id="get_jobs_acceptance_progress"></div>
                 </div>
                 <div class="col-lg-4">
-                    <a class="btn btn-default btn-group-justified get_jobs_configs" data-jenkins_page="Acceptance">Get
-                        jobs configs from
-                        Jenkins</a>
+                    <a class="btn btn-default btn-group-justified get_jobs_configs" data-jenkins_page="Acceptance"
+                       id="get_jobs_configs_acceptance">Get jobs configs from Jenkins<span class="badge updateTimeStamp"></span></a>
 
                     <div class="progressDiv" id="get_jobs_configs_acceptance_progress"></div>
                 </div>
                 <div class="col-lg-4">
                     <a class="btn btn-default btn-group-justified get_builds_and_save_results"
-                       data-jenkins_page="Acceptance">Get builds from Jenkins
-                    </a>
-
+                       data-jenkins_page="Acceptance" id="get_builds_and_save_results_acceptance">Get builds from
+                        Jenkins<span class="badge updateTimeStamp"></span></a>
                     <div class="progressDiv" id="get_builds_and_save_results_acceptance_progress"></div>
                 </div>
             </div>
@@ -56,21 +56,20 @@
             </div>
             <div class="panel-body">
                 <div class="col-lg-4">
-                    <a class="btn btn-default btn-group-justified get_jobs" data-jenkins_page="Trunk">Get jobs from
-                        Jenkins</a>
+                    <a class="btn btn-default btn-group-justified get_jobs" data-jenkins_page="Trunk"
+                       id="get_jobs_trunk">Get jobs from Jenkins<span class="badge updateTimeStamp"></span></a>
 
                     <div class="progressDiv" id="get_jobs_trunk_progress"></div>
                 </div>
                 <div class="col-lg-4">
-                    <a class="btn btn-default btn-group-justified get_jobs_configs" data-jenkins_page="Trunk">Get jobs
-                        configs from
-                        Jenkins</a>
+                    <a class="btn btn-default btn-group-justified get_jobs_configs" data-jenkins_page="Trunk"
+                       id="get_jobs_configs_trunk">Get jobs configs from Jenkins<span class="badge updateTimeStamp"></span></a>
 
                     <div class="progressDiv" id="get_jobs_configs_trunk_progress"></div>
                 </div>
                 <div class="col-lg-4">
                     <a class="btn btn-default btn-group-justified get_builds_and_save_results"
-                       data-jenkins_page="Trunk">Get builds from Jenkins
+                       data-jenkins_page="Trunk" id="get_builds_and_save_results_trunk">Get builds from Jenkins<span class="badge updateTimeStamp"></span>
                     </a>
 
                     <div class="progressDiv" id="get_builds_and_save_results_trunk_progress"></div>
@@ -83,21 +82,21 @@
             </div>
             <div class="panel-body">
                 <div class="col-lg-4">
-                    <a class="btn btn-default btn-group-justified get_jobs" data-jenkins_page="New trunk">Get jobs from
-                        Jenkins</a>
+                    <a class="btn btn-default btn-group-justified get_jobs" data-jenkins_page="New trunk"
+                       id="get_jobs_new_trunk">Get jobs from Jenkins<span class="badge updateTimeStamp"></span></a>
 
                     <div class="progressDiv" id="get_jobs_new_trunk_progress"></div>
                 </div>
                 <div class="col-lg-4">
-                    <a class="btn btn-default btn-group-justified get_jobs_configs" data-jenkins_page="New trunk">Get
-                        jobs configs from
-                        Jenkins</a>
+                    <a class="btn btn-default btn-group-justified get_jobs_configs" data-jenkins_page="New trunk"
+                       id="get_jobs_configs_new_trunk">Get jobs configs from Jenkins<span class="badge updateTimeStamp"></span></a>
 
                     <div class="progressDiv" id="get_jobs_configs_new_trunk_progress"></div>
                 </div>
                 <div class="col-lg-4">
                     <a class="btn btn-default btn-group-justified get_builds_and_save_results"
-                       data-jenkins_page="New trunk">Get builds from Jenkins
+                       data-jenkins_page="New trunk" id="get_builds_and_save_results_new_trunk">
+                        Get builds from Jenkins<span class="badge updateTimeStamp"></span>
                     </a>
 
                     <div class="progressDiv" id="get_builds_and_save_results_new_trunk_progress"></div>
@@ -110,25 +109,24 @@
             </div>
             <div class="panel-body">
                 <div class="col-lg-4">
-                    <a class="btn btn-default btn-group-justified get_jobs" data-jenkins_page="All other">Get jobs from
-                        Jenkins</a>
+                    <a class="btn btn-default btn-group-justified get_jobs" data-jenkins_page="All other"
+                       id="get_jobs_all_other">Get jobs from Jenkins<span class="badge updateTimeStamp"></span></a>
 
                     <div class="progressDiv" id="get_jobs_all_other_progress"></div>
                 </div>
-{#                <div class="col-lg-4">#}
-{#                    <a class="btn btn-default btn-group-justified get_jobs_configs" data-jenkins_page="New trunk">Get#}
-{#                        jobs configs from#}
-{#                        Jenkins</a>#}
-{##}
-{#                    <div class="progressDiv" id="get_jobs_configs_new_trunk_progress"></div>#}
-{#                </div>#}
-{#                <div class="col-lg-4">#}
-{#                    <a class="btn btn-default btn-group-justified get_builds_and_save_results"#}
-{#                       data-jenkins_page="New trunk">Get builds from Jenkins#}
-{#                    </a>#}
-{##}
-{#                    <div class="progressDiv" id="get_builds_and_save_results_new_trunk_progress"></div>#}
-{#                </div>#}
+                <div class="col-lg-4">
+                    <a class="btn btn-default btn-group-justified get_jobs_configs" data-jenkins_page="All other"
+                       id="get_jobs_configs_all_other">Get jobs configs from Jenkins<span class="badge updateTimeStamp"></span></a>
+
+                    <div class="progressDiv" id="get_jobs_configs_all_other_progress"></div>
+                </div>
+                {#                <div class="col-lg-4">#}
+                {#                    <a class="btn btn-default btn-group-justified get_builds_and_save_results"#}
+                {#                       data-jenkins_page="New trunk">Get builds from Jenkins#}
+                {#                    </a>#}
+                {##}
+                {#                    <div class="progressDiv" id="get_builds_and_save_results_new_trunk_progress"></div>#}
+                {#                </div>#}
             </div>
         </div>
         <div>
@@ -143,4 +141,6 @@
             </button>
         </div>
     </div>
+    <script type="text/javascript" src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/data_collection_scripts.js' %}"></script>
 {% endblock %}

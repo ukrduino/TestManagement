@@ -9,7 +9,8 @@ urlpatterns = [
     url(r'^data_collection/get_jobs_configs/$', 'TestCases.views.get_jobs_configs_from_jenkins'),
     url(r'^data_collection/get_builds_and_save_results/$', 'TestCases.views.get_builds_and_save_results'),
     url(r'^data_collection/delete/$', 'TestCases.views.delete'),
-    url(r'^data_collection/json/$', 'TestCases.views.update_progress_bar'),
+    url(r'^data_collection/update_progress_bar/$', 'TestCases.views.update_progress_bar'),
+    url(r'^data_collection/update_time_stamps/$', 'TestCases.views.update_time_stamps'),
 
 
     url(r'^search_jobs/$', 'TestCases.views.search_jobs_page', name="search_jobs"),
