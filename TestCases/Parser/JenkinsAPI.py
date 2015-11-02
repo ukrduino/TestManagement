@@ -161,26 +161,40 @@ def get_build_results_from_jenkins(job_jenkins_page):
     driver = webdriver.Firefox(firefox_profile)
     driver.implicitly_wait(10)
     for job in job_objects:
-        job_inst = server.get_job(job.job_name)
-        # getting builds for job
-        builds_dict = job_inst.get_build_dict()
-        builds_number_list = list(builds_dict.keys())
-        builds_number_list.sort()
-        for build_number in builds_number_list[-7:]:
-            driver.get(builds_dict.get(build_number) + BUILD_RESULTS_REPORT_LINK)
-            time.sleep(1)
-            # checking do we have successfully generated report
-            app_version_search_result = re.findall("Application Version", driver.page_source)
-            if len(app_version_search_result):
-                build_inst = job_inst.get_build(build_number)
-                build_run_time = str(build_inst.get_duration()).split('.')[0]
-                build_date = build_inst.get_timestamp().strftime('%d.%m.%Y %H:%M')
-                new_build = create_new_build(job,
-                                             build_number,
-                                             builds_dict.get(build_number) + BUILD_RESULTS_REPORT_LINK_SHORT,
-                                             build_date,
-                                             build_run_time)
-                process_report(job_jenkins_page, new_build, driver.page_source)
+        try:
+            job_inst = server.get_job(job.job_name)
+            # getting builds for job
+            jenk_builds_dict = job_inst.get_build_dict()
+            jenk_builds_number_list = list(jenk_builds_dict.keys())
+            jenk_builds_number_list.sort()
+            print("jenk_builds_number_list")
+            print(jenk_builds_number_list)
+            job_builds_objects = JobBuild.objects.filter(job_id=job.id)
+            db_builds_numbers_list = [build.build_number for build in job_builds_objects]
+            db_builds_numbers_list.sort()
+            print("db_builds_numbers_list")
+            print(db_builds_numbers_list)
+            for build_number in jenk_builds_number_list[-BUILD_PER_PAGE:]:
+                if build_number not in db_builds_numbers_list:
+                    print("unique build_number - " + str(build_number))
+                    driver.get(jenk_builds_dict.get(build_number) + BUILD_RESULTS_REPORT_LINK)
+                    time.sleep(1)
+                    # checking do we have successfully generated report
+                    app_version_search_result = re.findall("Application Version", driver.page_source)
+                    if len(app_version_search_result):
+                        build_inst = job_inst.get_build(build_number)
+                        build_run_time = str(build_inst.get_duration()).split('.')[0]
+                        build_date = build_inst.get_timestamp().strftime('%d.%m.%Y %H:%M')
+                        new_build = create_new_build(job,
+                                                     build_number,
+                                                     jenk_builds_dict.get(build_number) + BUILD_RESULTS_REPORT_LINK_SHORT,
+                                                     build_date,
+                                                     build_run_time)
+                        process_report(job_jenkins_page, new_build, driver.page_source)
+        except Exception as e:
+            print(job.job_name)
+            print(e)
+            print("Failed to get - job.job_name from Jenkins")
         progress_bar.increase()
     progress_bar.clear()
     driver.quit()

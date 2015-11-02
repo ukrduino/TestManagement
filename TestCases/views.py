@@ -30,7 +30,8 @@ def delete(request):
     if request.method == 'POST':
         object_to_delete = request.POST['object_to_delete']
         if object_to_delete == "all tests":
-            init_data_collection_time_stamps_clear(True)
+            DataCollectionTimeStamps.objects.all().delete()
+            init_data_collection_time_stamps()
             logger.info(" > cleaning DB (deleting Test classes and Test cases)")
             TestClass.objects.all().delete()
             TestCase.objects.all().delete()
@@ -48,78 +49,66 @@ def delete(request):
 
 
 def parse_java_code(request):
-    time_stamp = init_data_collection_time_stamps_clear(True)
+    time_stamp = init_data_collection_time_stamps()
     JavaTestsParser.get_tests_headers_from_java_code()
-    time_stamp.parse_java_code = timezone.now()
+    time_stamp.parse_java_code = timezone.now().strftime("%d %b %H:%M")
     time_stamp.save()
     return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
 
 
 def save_instances_to_db(request):
-    time_stamp = init_data_collection_time_stamps_clear()
+    time_stamp = init_data_collection_time_stamps()
     JavaTestsParser.create_instances_and_put_to_db()
-    time_stamp.save_instances_to_db = timezone.now()
+    time_stamp.save_instances_to_db = timezone.now().strftime("%d %b %H:%M")
     time_stamp.save()
     return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
 
 
 def get_jobs_from_jenkins(request):
-    time_stamp = init_data_collection_time_stamps_clear()
+    time_stamp = init_data_collection_time_stamps()
     if request.method == 'POST':
         jenkins_page = request.POST['jenkins_page']
         if jenkins_page == ACCEPTANCE:
             JenkinsAPI.get_jobs_from_jenkins(ACCEPTANCE_URL, EXCLUDED_ACCEPTANCE_JOBS, ACCEPTANCE)
-            time_stamp.get_jobs_acceptance = timezone.now()
-            time_stamp.save()
-        if jenkins_page == TRUNK:
-            JenkinsAPI.get_jobs_from_jenkins(TRUNK_URL, EXCLUDED_TRUNK_JOBS, TRUNK)
-            time_stamp.get_jobs_trunk = timezone.now()
-            time_stamp.save()
+            time_stamp.get_jobs_acceptance = timezone.now().strftime("%d %b %H:%M")
         if jenkins_page == NEW_TRUNK:
             JenkinsAPI.get_jobs_from_jenkins(NEW_TRUNK_URL, EXCLUDED_NEW_TRUNK_JOBS, NEW_TRUNK)
-            time_stamp.get_jobs_new_trunk = timezone.now()
-            time_stamp.save()
+            time_stamp.get_jobs_new_trunk = timezone.now().strftime("%d %b %H:%M")
         if jenkins_page == ALL_OTHER:
             JenkinsAPI.get_jobs_from_jenkins(ALL_OTHER_URL, EXCLUDED_ALL_OTHER_JOBS, ALL_OTHER)
-            time_stamp.get_jobs_all_other = timezone.now()
-            time_stamp.save()
+            time_stamp.get_jobs_all_other = timezone.now().strftime("%d %b %H:%M")
+        time_stamp.save()
     return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
 
 
 def get_jobs_configs_from_jenkins(request):
-    time_stamp = init_data_collection_time_stamps_clear()
     if request.method == 'POST':
+        time_stamp = init_data_collection_time_stamps()
         jenkins_page = request.POST['jenkins_page']
         if jenkins_page == ACCEPTANCE:
             JenkinsAPI.add_config_data_to_jobs(ACCEPTANCE)
-            time_stamp.get_jobs_configs_acceptance = timezone.now()
-        if jenkins_page == TRUNK:
-            JenkinsAPI.add_config_data_to_jobs(TRUNK)
-            time_stamp.get_jobs_configs_trunk = timezone.now()
+            time_stamp.get_jobs_configs_acceptance = timezone.now().strftime("%d %b %H:%M")
         if jenkins_page == NEW_TRUNK:
             JenkinsAPI.add_config_data_to_jobs(NEW_TRUNK)
-            time_stamp.get_jobs_config_new_trunk = timezone.now()
+            time_stamp.get_jobs_configs_new_trunk = timezone.now().strftime("%d %b %H:%M")
         if jenkins_page == ALL_OTHER:
             JenkinsAPI.add_config_data_to_jobs(ALL_OTHER)
-            time_stamp.get_jobs_config_all_other = timezone.now()
-    time_stamp.save()
+            time_stamp.get_jobs_configs_all_other = timezone.now().strftime("%d %b %H:%M")
+        time_stamp.save()
     return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
 
 
 def get_builds_and_save_results(request):
-    time_stamp = init_data_collection_time_stamps_clear()
     if request.method == 'POST':
+        time_stamp = init_data_collection_time_stamps()
         jenkins_page = request.POST['jenkins_page']
         if jenkins_page == ACCEPTANCE:
             JenkinsAPI.get_build_results_from_jenkins(ACCEPTANCE)
-            time_stamp.get_builds_and_save_results_acceptance = timezone.now()
-        if jenkins_page == TRUNK:
-            JenkinsAPI.get_build_results_from_jenkins(TRUNK)
-            time_stamp.get_builds_and_save_results_trunk = timezone.now()
+            time_stamp.get_builds_and_save_results_acceptance = timezone.now().strftime("%d %b %H:%M")
         if jenkins_page == NEW_TRUNK:
             JenkinsAPI.get_build_results_from_jenkins(NEW_TRUNK)
-            time_stamp.get_builds_and_save_results_new_trunk = timezone.now()
-    time_stamp.save()
+            time_stamp.get_builds_and_save_results_new_trunk = timezone.now().strftime("%d %b %H:%M")
+        time_stamp.save()
     return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
 
 
@@ -198,9 +187,9 @@ def show_test_for_jobs(request):
     if request.method == 'POST':
         job_id = request.POST['job_id']
         builds = JobBuild.objects.filter(job__id=job_id).order_by('build_number')
-        tests_for_job = find_tests_for_job_from_builds(builds)
+        tests_for_job_set = find_tests_for_job_from_builds(builds)
         tests_with_results = dict()
-        for test in tests_for_job:
+        for test in tests_for_job_set:
             results_for_test = list()
             for build in builds:
                 result = TestResult.objects.filter(build__id=build.id)
@@ -213,13 +202,13 @@ def show_test_for_jobs(request):
 
 
 def find_tests_for_job_from_builds(builds):
-    tests_for_job = set()
+    tests_for_job_set = set()
     for build in builds:
         results_for_build = TestResult.objects.filter(build__id=build.id)
         for result in results_for_build:
             test = TestClass.objects.get(id=result.test_class.id)
-            tests_for_job.add(test)
-    return tests_for_job
+            tests_for_job_set.add(test)
+    return tests_for_job_set
 
 
 # JOBS CONFIGS PAGE
@@ -283,8 +272,5 @@ def update_time_stamps(request):
     time_stamp_fields_dict = DataCollectionTimeStamps.objects.last().__dict__
     for field, stored_data in time_stamp_fields_dict.items():
         if field != "_state" and field != "id":
-            if stored_data:
-                resp[field] = stored_data.strftime("%d %b %H:%M %Z")
-            else:
-                resp[field] = "no data"
+            resp[field] = stored_data
     return HttpResponse(json.dumps(resp))
