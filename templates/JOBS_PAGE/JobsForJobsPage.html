@@ -1,7 +1,7 @@
 {% load staticfiles %}
 {% for job_in_header, builds in jobs_with_builds.items %}
     <h4></h4>
-    <table class="table table-bordered">
+    <table class="table table-bordered jobs_results_table" id="{{ job_in_header.job_name }}">
         <thead>
         <tr>
             <th class="counter">{{ forloop.counter }}</th>

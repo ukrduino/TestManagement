@@ -49,6 +49,7 @@ def delete(request):
 
 
 def parse_java_code(request):
+    DataCollectionTimeStamps.objects.all().delete()
     time_stamp = init_data_collection_time_stamps()
     JavaTestsParser.get_tests_headers_from_java_code()
     time_stamp.parse_java_code = timezone.now().strftime("%d %b %H:%M")

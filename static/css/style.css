@@ -62,3 +62,11 @@ body{
     margin-left: 5px !important;
     background-color: deepskyblue;
 }
+
+#environments_filter_radio_buttons{
+    margin-bottom: 20px;
+}
+
+#environments_filter_radio_buttons > .radio > label{
+    margin-left: 30px;
+}

@@ -49,3 +49,43 @@ $('#myModal').on('show.bs.modal', function (e) {
     var stack_trace = $(e.relatedTarget).data('stack');
     $(e.currentTarget).find('pre.stack_trace').text(stack_trace)
 });
+
+$(document).ready(function () {
+        $("input[type='radio']").change(function () {
+                var env = $("input[type='radio']:checked").val();
+                console.log(env);
+                filter_jobs_results_by_env(env);
+            }
+        );
+    }
+);
+
+function filter_jobs_results_by_env(env){
+    if(env == "ALL"){
+        $(".jobs_results_table").show()
+    }
+    if(env == "AUTO1"){
+        $(".jobs_results_table").hide();
+        $("[id*='AUTO1']").show()
+    }
+    if(env == "AUTO2"){
+        $(".jobs_results_table").hide();
+        $("[id*='AUTO2']").show()
+    }
+    if(env == "AUTO3"){
+        $(".jobs_results_table").hide();
+        $("[id*='AUTO3']").show()
+    }
+    if(env == "AUTO4"){
+        $(".jobs_results_table").hide();
+        $("[id*='AUTO4']").show()
+    }
+    if(env == "TEST"){
+        $(".jobs_results_table").hide();
+        $("[id*='TEST']").show()
+    }
+    if(env == "DEV1"){
+        $(".jobs_results_table").hide();
+        $("[id*='DEV1']").show()
+    }
+}

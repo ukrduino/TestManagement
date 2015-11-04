@@ -3,12 +3,30 @@
 
 {% block acceptance_jobs_page %}
     <div class="row page_content" style="text-align: right">
-    {% csrf_token %}
+        {% csrf_token %}
         <div class="btn-group" role="group" aria-label="..." style="margin-bottom: 20px">
             <button type="button" class="btn btn-info show_jobs_results" data-jenkins_page="Acceptance">Acceptance
             </button>
             <button type="button" class="btn btn-info show_jobs_results" data-jenkins_page="New trunk">New trunk
             </button>
+        </div>
+        <div id="environments_filter_radio_buttons">
+            <div class="radio radio-info">
+                <input type="radio" id="radio7" name="env_radio" value="ALL">
+                <label for="radio7">ALL</label>
+                <input type="radio" id="radio1" name="env_radio" value="AUTO1">
+                <label for="radio1">AUTO1</label>
+                <input type="radio" id="radio2" name="env_radio" value="AUTO2">
+                <label for="radio2">AUTO2</label>
+                <input type="radio" id="radio3" name="env_radio" value="AUTO3">
+                <label for="radio3">AUTO3</label>
+                <input type="radio" id="radio4" name="env_radio" value="AUTO4">
+                <label for="radio4">AUTO4</label>
+                <input type="radio" id="radio5" name="env_radio" value="DEV1">
+                <label for="radio5">DEV1</label>
+                <input type="radio" id="radio6" name="env_radio" value="TEST">
+                <label for="radio6">TEST</label>
+            </div>
         </div>
         <div id="jobs_results_in_template">
         </div>
