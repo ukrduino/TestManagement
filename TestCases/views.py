@@ -1,9 +1,10 @@
 import json
 
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, HttpResponse
 from django.template import RequestContext
-from django.utils import timezone
 
+from TestCases.forms import ToDoNotesForm
 from TestManagement.local_settings import *
 from TestCases.Parser import JavaTestsParser, JenkinsAPI
 from TestCases.models import *
@@ -188,8 +189,10 @@ def show_test_for_jobs(request):
     if request.method == 'POST':
         job_id = request.POST['job_id']
         builds = JobBuild.objects.filter(job__id=job_id).order_by('build_number')
+        # set of tests for Job
         tests_for_job_set = find_tests_for_job_from_builds(builds)
-        tests_with_results = dict()
+        tests_with_results = list()
+        # get results for each test
         for test in tests_for_job_set:
             results_for_test = list()
             for build in builds:
@@ -197,7 +200,7 @@ def show_test_for_jobs(request):
                 for res in result:
                     if res.test_class.id == test.id:
                         results_for_test.append(res)
-            tests_with_results[test] = results_for_test
+            tests_with_results.append({"test": test, "test_name": test.test_class_name, "test_results": results_for_test})
         args['tests_with_results'] = tests_with_results
     return render_to_response("JOBS_PAGE/TestsForJobsPage.html", args, context_instance=RequestContext(request))
 
@@ -275,3 +278,21 @@ def update_time_stamps(request):
         if field != "_state" and field != "id":
             resp[field] = stored_data
     return HttpResponse(json.dumps(resp))
+
+
+def todo_page(request):
+    args = dict()
+    args['form'] = ToDoNotesForm
+    args["to_do_notes"] = ToDoNotes.objects.all()
+    return render_to_response("TODO_PAGE/ToDoPage.html",
+                              args,
+                              context_instance=RequestContext(request))
+
+
+def new_todo(request):
+    if request.method == 'POST':
+        form = ToDoNotesForm(request.POST)
+        if form.is_valid():
+            add = form.save(commit=False)
+            add.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))

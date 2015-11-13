@@ -28,6 +28,7 @@
                         {% endif %}
                     </p>
                     <span class="label label-default">{{ build.build_app_ver }}</span>
+                    <a href="{{ build.build_console_link }}" target=_blank><img id="terminal_icon" src="{% static 'terminal.png' %}"/></a>
                 </th>
             {% endfor %}
         </tr>

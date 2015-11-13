@@ -1,11 +1,10 @@
-{% for test, results in tests_with_results.items %}
+{% for test_dict in tests_with_results|dictsort:"test_name" %}
     <tr>
         <td class="counter">{{ forloop.counter }}</td>
         <td>
-            {# TODO Add link to TestCase #}
-            <a href="{{ test. }}" target=_blank>{{ test.test_class_name }}</a>
+            <p>{{ test_dict.test_name }}</p>
         </td>
-        {% for result in results %}
+        {% for result in test_dict.test_results %}
             {% if result.test_passed == 'passed' %}
                 <td>
                     <span class="glyphicon glyphicon-ok-sign text-success build" aria-hidden="true"></span>

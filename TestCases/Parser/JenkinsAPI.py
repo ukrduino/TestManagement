@@ -32,7 +32,8 @@ def get_jobs_from_jenkins(view_url, excluded_jobs, job_jenkins_page):
         jobs_with_the_same_title = Job.objects.filter(job_name=job_title)
         # filtering jobs by duplicates
         if jobs_with_the_same_title:
-            logger.info(">>> Job with title [" + job_title + "] on [" + job_jenkins_page + "] page is already created on other page")
+            logger.info(">>> Job with title [" +
+                        job_title + "] on [" + job_jenkins_page + "] page is already created on other page")
             for job in jobs_with_the_same_title:
                 logger.info(">>>>> [" + str(job.id) + "] [" + job.job_name + "] [" + job.job_jenkins_page + "]")
             logger.info("Job was not created")
@@ -123,8 +124,8 @@ def get_data_from_job_config(job_name, config_xml):
                 if property_content.startswith("TEST_GROUPS="):
                     config_data_dict["groups_list"] = property_content.replace("TEST_GROUPS=", "").split(",")
         else:
-            properties_content_tag_list = config_dict.project.builders.EnvInjectBuilder.info.propertiesContent.cdata.split(
-                "\n")
+            properties_content_tag_list = config_dict.project.builders.EnvInjectBuilder.info\
+                .propertiesContent.cdata.split("\n")
             for property_content in properties_content_tag_list:
                 if property_content.startswith("TEST_GROUPS="):
                     config_data_dict["groups_list"] = property_content.replace("TEST_GROUPS=", "").split(",")
@@ -167,16 +168,11 @@ def get_build_results_from_jenkins(job_jenkins_page):
             jenk_builds_dict = job_inst.get_build_dict()
             jenk_builds_number_list = list(jenk_builds_dict.keys())
             jenk_builds_number_list.sort()
-            print("jenk_builds_number_list")
-            print(jenk_builds_number_list)
             job_builds_objects = JobBuild.objects.filter(job_id=job.id)
             db_builds_numbers_list = [build.build_number for build in job_builds_objects]
             db_builds_numbers_list.sort()
-            print("db_builds_numbers_list")
-            print(db_builds_numbers_list)
             for build_number in jenk_builds_number_list[-BUILD_PER_PAGE:]:
                 if build_number not in db_builds_numbers_list:
-                    print("unique build_number - " + str(build_number))
                     driver.get(jenk_builds_dict.get(build_number) + BUILD_RESULTS_REPORT_LINK)
                     time.sleep(1)
                     # checking do we have successfully generated report
@@ -187,7 +183,10 @@ def get_build_results_from_jenkins(job_jenkins_page):
                         build_date = build_inst.get_timestamp().strftime('%d.%m.%Y %H:%M')
                         new_build = create_new_build(job,
                                                      build_number,
-                                                     jenk_builds_dict.get(build_number) + BUILD_RESULTS_REPORT_LINK_SHORT,
+                                                     jenk_builds_dict.get(build_number).replace("%20", " ") +
+                                                     BUILD_RESULTS_REPORT_LINK_SHORT,
+                                                     jenk_builds_dict.get(build_number).replace("%20", " ") +
+                                                     BUILD_RESULTS_CONSOLE_LINK,
                                                      build_date,
                                                      build_run_time)
                         process_report(job_jenkins_page, new_build, driver.page_source)

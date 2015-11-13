@@ -31,4 +31,6 @@ urlpatterns = [
 
     url(r'^all_test_cases/$', 'TestCases.views.show_all_test_cases', name="show_all_test_cases"),
     url(r'^groups/$', 'TestCases.views.groups_page', name="groups_page"),
+    url(r'^todo/$', 'TestCases.views.todo_page', name="todo_page"),
+    url(r'new_todo/$', 'TestCases.views.new_todo', name='new_todo'),
 ]

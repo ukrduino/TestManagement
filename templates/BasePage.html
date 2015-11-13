@@ -45,6 +45,7 @@
                 </li>
                 <li><a class="HeaderPanelText" href="{% url 'groups_page' %}">GROUPS</a></li>
                 <li><a class="HeaderPanelText" href="{% url 'data_collection' %}">DATA COLLECTION</a></li>
+                <li><a class="HeaderPanelText" href="{% url 'todo_page' %}">ToDo</a></li>
             </ul>
         </div>
     </div>
@@ -58,6 +59,7 @@
         {% block data_collection_page %}{% endblock %}
         {% block jobs_configs_page %}{% endblock %}
         {% block groups_page %}{% endblock %}
+        {% block todo_page %}{% endblock %}
     </div>
 </div>
 <div id="bottom_buffer"></div>

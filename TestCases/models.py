@@ -1,6 +1,7 @@
 import logging
 
 from django.db import models
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,7 @@ class JobBuild(models.Model):
     build_app_ver = models.CharField(verbose_name="Version of App", max_length=200, blank=True)
     build_date = models.CharField(verbose_name="Date of build", max_length=200, blank=True)
     build_link = models.CharField(verbose_name="Build link", max_length=200, blank=True)
+    build_console_link = models.CharField(verbose_name="Build console link", max_length=200, blank=True)
     build_run_time = models.CharField(verbose_name="Build run time", max_length=200, blank=True)
     build_successful = models.BooleanField(verbose_name="Was build successful", default=False)
 
@@ -57,11 +59,13 @@ class JobBuild(models.Model):
         return "Build #" + str(self.build_number) + " of " + self.job.job_name
 
 
-def create_new_build(new_job, build_number, build_link, build_date, build_run_time):  # TODO move to class constructor
+def create_new_build(new_job, build_number, build_link, build_console_link, build_date,
+                     build_run_time):  # TODO move to class constructor
     # creating new build
     new_build = JobBuild(job=new_job,
                          build_number=build_number,
                          build_link=build_link,
+                         build_console_link=build_console_link,
                          build_date=build_date,
                          build_run_time=build_run_time)
     new_build.save()
@@ -232,6 +236,25 @@ def init_data_collection_time_stamps():
         return time_stamp
     else:
         return DataCollectionTimeStamps.objects.last()
+
+
+class ToDoNotes(models.Model):
+    class Meta:
+        db_table = 'to_do_notes'
+        verbose_name = 'ToDo notes'
+    title = models.CharField(verbose_name="ToDo title", max_length=200)
+    content = models.TextField(verbose_name="ToDo title")
+    done = models.BooleanField(verbose_name="ToDo done", default=False)
+    discarded = models.BooleanField(default=False, verbose_name="ToDo discarded")
+    created = models.DateTimeField(verbose_name='ToDo created')
+    modified = models.DateTimeField(verbose_name='ToDo modified')
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+        return super(ToDoNotes, self).save(*args, **kwargs)
 
 # Making migrations
 # http://stackoverflow.com/a/29898483

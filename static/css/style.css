@@ -18,6 +18,7 @@
 
 .page_content{
     margin-top: 45px;
+    margin-bottom: 45px;
 }
 
 .home_page_big_numbers{
@@ -69,4 +70,21 @@ body{
 
 #environments_filter_radio_buttons > .radio > label{
     margin-left: 30px;
+}
+
+.jumbotron{
+    padding: 50px;
+}
+
+#terminal_icon{
+    height:20px;
+    margin-top:5px
+}
+
+.stack_trace{
+    overflow: scroll
+}
+
+.to_do_id{
+    margin-left: 10px;
 }

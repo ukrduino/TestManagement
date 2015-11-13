@@ -1,0 +1,54 @@
+{% extends 'BasePage.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block todo_page %}
+    <div class="row page_content">
+        {% for note in to_do_notes %}
+            {% if  note.done %}
+                <div class="panel panel-success">
+            {% elif  note.discarded %}
+                <div class="panel panel-danger">
+            {% else %}
+                <div class="panel panel-info">
+            {% endif %}
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-lg-11">
+                    <h3 class="panel-title">#{{ forloop.counter }} {{ note.title }}</h3>
+                </div>
+                <div class="col-lg-1">
+                    <a class="failed" href="#edit_to_do_modal_form" data-toggle="modal" data-stack="{{ note.id }}">
+                        <button class="btn btn-sm btn-info edit_to_do_button">Edit</button>
+                    </a>
+                    <span class="panel-title to_do_id">[id:{{ note.id }}]</span>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <p>{{ note.content }}</p>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-lg-2">Created: {{ note.created }}</div>
+                <div class="col-lg-2 col-lg-offset-8">Modified: {{ note.modified }}</div>
+            </div>
+        </div>
+        </div>
+        {% endfor %}
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">Create new ToDo note</h3>
+            </div>
+            <div class="panel-body">
+                <form action="{% url 'new_todo' %}" method="post">
+                    {% csrf_token %}
+                    {% bootstrap_form form layout='inline' %}
+                    <input type="submit" class="btn btn-success" value="Create new todo">
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{#https://claudiomelendrez.wordpress.com/2013/04/03/ajax-django-part-1/#}
