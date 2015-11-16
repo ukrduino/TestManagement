@@ -33,4 +33,6 @@ urlpatterns = [
     url(r'^groups/$', 'TestCases.views.groups_page', name="groups_page"),
     url(r'^todo/$', 'TestCases.views.todo_page', name="todo_page"),
     url(r'new_todo/$', 'TestCases.views.new_todo', name='new_todo'),
+    url(r'edit_todo/(?P<todo_id>\d+)$', 'TestCases.views.edit_todo_page', name='edit_todo_page'),
+    url(r'edit_todo_save/(?P<todo_id>\d+)$', 'TestCases.views.edit_todo_save', name='edit_todo_save'),
 ]

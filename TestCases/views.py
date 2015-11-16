@@ -1,13 +1,13 @@
 import json
 
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response, HttpResponse
+from django.shortcuts import render_to_response, HttpResponse, redirect
 from django.template import RequestContext
 
-from TestCases.forms import ToDoNotesForm
-from TestManagement.local_settings import *
 from TestCases.Parser import JavaTestsParser, JenkinsAPI
+from TestCases.forms import *
 from TestCases.models import *
+from TestManagement.local_settings import *
 
 logger = logging.getLogger(__name__)
 
@@ -200,7 +200,9 @@ def show_test_for_jobs(request):
                 for res in result:
                     if res.test_class.id == test.id:
                         results_for_test.append(res)
-            tests_with_results.append({"test": test, "test_name": test.test_class_name, "test_results": results_for_test})
+            tests_with_results.append({"test": test,
+                                       "test_name": test.test_class_name,
+                                       "test_results": results_for_test})
         args['tests_with_results'] = tests_with_results
     return render_to_response("JOBS_PAGE/TestsForJobsPage.html", args, context_instance=RequestContext(request))
 
@@ -282,8 +284,8 @@ def update_time_stamps(request):
 
 def todo_page(request):
     args = dict()
-    args['form'] = ToDoNotesForm
-    args["to_do_notes"] = ToDoNotes.objects.all()
+    args['form'] = CreateToDoNoteForm
+    args["to_do_notes"] = ToDoNote.objects.all().order_by('-id')
     return render_to_response("TODO_PAGE/ToDoPage.html",
                               args,
                               context_instance=RequestContext(request))
@@ -291,8 +293,27 @@ def todo_page(request):
 
 def new_todo(request):
     if request.method == 'POST':
-        form = ToDoNotesForm(request.POST)
+        form = CreateToDoNoteForm(request.POST)
         if form.is_valid():
             add = form.save(commit=False)
             add.save()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+def edit_todo_page(request, todo_id):
+    args = dict()
+    to_do_note = ToDoNote.objects.get(id=todo_id)
+    args['form'] = EditToDoNoteForm(instance=to_do_note)
+    args["to_do_note"] = to_do_note
+    return render_to_response("TODO_PAGE/EditToDoPage.html",
+                              args,
+                              context_instance=RequestContext(request))
+
+
+def edit_todo_save(request, todo_id):
+    instance = ToDoNote.objects.get(id=todo_id)
+    form = EditToDoNoteForm(request.POST or None, instance=instance)
+    if form.is_valid():
+        form.save()
+        return redirect('todo_page')
+    return edit_todo_page(request, todo_id)

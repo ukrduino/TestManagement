@@ -238,7 +238,7 @@ def init_data_collection_time_stamps():
         return DataCollectionTimeStamps.objects.last()
 
 
-class ToDoNotes(models.Model):
+class ToDoNote(models.Model):
     class Meta:
         db_table = 'to_do_notes'
         verbose_name = 'ToDo notes'
@@ -254,7 +254,7 @@ class ToDoNotes(models.Model):
         if not self.id:
             self.created = timezone.now()
         self.modified = timezone.now()
-        return super(ToDoNotes, self).save(*args, **kwargs)
+        return super(ToDoNote, self).save(*args, **kwargs)
 
 # Making migrations
 # http://stackoverflow.com/a/29898483
