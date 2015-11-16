@@ -44,8 +44,12 @@ def delete(request):
             Job.objects.all().delete()
         if object_to_delete == "all builds and results":
             logger.info(" > cleaning DB (deleting JobBuilds, TestResult)")
+            time_stamp = init_data_collection_time_stamps()
             JobBuild.objects.all().delete()
             TestResult.objects.all().delete()
+            time_stamp.get_builds_and_save_results_acceptance = "no data"
+            time_stamp.get_builds_and_save_results_new_trunk = "no data"
+            time_stamp.save()
     return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
 
 
@@ -197,10 +201,21 @@ def show_test_for_jobs(request):
             results_for_test = list()
             for build in builds:
                 result = TestResult.objects.filter(build__id=build.id)
+                result_present = False
                 for res in result:
                     if res.test_class.id == test.id:
                         results_for_test.append(res)
+                        result_present = True
+                        break
+                # if test has no result for this build we creating blank result
+                if not result_present:
+                    new_test_result = TestResult(test_class=test,
+                                                 build=build,
+                                                 test_passed="absent",
+                                                 test_stack_trace="")
+                    results_for_test.append(new_test_result)
             tests_with_results.append({"test": test,
+                                       "test_cases": TestCase.objects.filter(test_case_class=test),
                                        "test_name": test.test_class_name,
                                        "test_results": results_for_test})
         args['tests_with_results'] = tests_with_results

@@ -12,17 +12,18 @@
             {% else %}
                 <div class="panel panel-info">
             {% endif %}
-                <div class="panel-heading">
-                    <h3 class="panel-title">Edit ToDo Note</h3>
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Edit ToDo Note</h3>
+                    </div>
+                    <div class="panel-body">
+                            <form action="{% url 'edit_todo_save'  to_do_note.pk %}" method="post">
+                                {% csrf_token %}
+                                {% bootstrap_form form layout='inline' %}
+                                <input type="submit" class="btn btn-success" value="Update ToDoNote">
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="panel-body">
-                    <form action="{% url 'edit_todo_save'  to_do_note.pk %}" method="post">
-                        {% csrf_token %}
-                        {% bootstrap_form form layout='inline' %}
-                        <input type="submit" class="btn btn-success" value="Update ToDoNote">
-                    </form>
-                </div>
-            </div>
         </div>
     </div>
 {% endblock %}

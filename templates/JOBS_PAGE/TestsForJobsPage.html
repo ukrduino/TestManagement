@@ -3,6 +3,9 @@
         <td class="counter">{{ forloop.counter }}</td>
         <td>
             <p>{{ test_dict.test_name }}</p>
+            {% for case in test_dict.test_cases %}
+                <a href="{{ case.test_case_link }}" target="_blank">{{ case.test_case_name }}</a> |
+            {% endfor %}
         </td>
         {% for result in test_dict.test_results %}
             {% if result.test_passed == 'passed' %}
@@ -20,6 +23,11 @@
             {% if result.test_passed == 'skipped' %}
                 <td>
                     <span class="glyphicon glyphicon-question-sign text-warning build" aria-hidden="true"></span>
+                </td>
+            {% endif %}
+            {% if result.test_passed == 'absent' %}
+                <td>
+                    <span class="glyphicon glyphicon-option-horizontal text-muted build" aria-hidden="true"></span>
                 </td>
             {% endif %}
         {% endfor %}
