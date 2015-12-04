@@ -51,6 +51,7 @@ class JobBuild(models.Model):
     build_console_link = models.CharField(verbose_name="Build console link", max_length=200, blank=True)
     build_run_time = models.CharField(verbose_name="Build run time", max_length=200, blank=True)
     build_successful = models.BooleanField(verbose_name="Was build successful", default=False)
+    build_number_of_failed_tests = models.IntegerField(verbose_name="Number of failed tests in build", default=0)
 
     def __str__(self):
         return "Build #" + str(self.build_number) + " of " + self.job.job_name

@@ -1,14 +1,14 @@
 import re
 import time
 
-from jenkinsapi.jenkins import Jenkins
-from bs4 import BeautifulSoup
-from selenium import webdriver
 import untangle
+from bs4 import BeautifulSoup
+from jenkinsapi.jenkins import Jenkins
+from selenium import webdriver
 from untangle import Element
 
-from TestManagement.local_settings import *
 from TestCases.models import *
+from TestManagement.local_settings import *
 
 logger = logging.getLogger(__name__)
 
@@ -214,6 +214,7 @@ def process_report(job_jenkins_page, new_build, html_report):
             if failed_test_class_name not in unique_test_classes_set:
                 create_new_test_result(new_build, failed_test_class_name, "failed", failed_test_class_stack_trace)
                 unique_test_classes_set.add(failed_test_class_name)
+                new_build.build_number_of_failed_tests += 1
             else:
                 logger.info(" >>>>>> TEST RESULTS ERROR - Test class " + failed_test_class_name +
                             " has more then one failed result in build #" + str(new_build.build_number))
@@ -227,6 +228,7 @@ def process_report(job_jenkins_page, new_build, html_report):
             if skipped_test_class_name not in unique_test_classes_set:
                 create_new_test_result(new_build, skipped_test_class_name, "skipped", "")
                 unique_test_classes_set.add(skipped_test_class_name)
+                new_build.build_number_of_failed_tests += 1
 
     passed_test_methods = html_report_soup.find_all(id="passedTest")
     if len(passed_test_methods) > 0:
@@ -242,6 +244,7 @@ def process_report(job_jenkins_page, new_build, html_report):
     # saving successful_build if its successful
     if successful_build and len(unique_test_classes_set) > 0:
         new_build.build_successful = True
+        new_build.build_number_of_failed_tests = 0
     pre_text = html_report_soup.find('pre').getText().replace("\n", "")
     # saving app_version
     if job_jenkins_page == ACCEPTANCE:

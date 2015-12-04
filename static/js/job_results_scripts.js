@@ -33,6 +33,12 @@ function show_jobs_results_in_template(data) {
         });
     });
     $('[data-toggle="tooltip"]').tooltip()
+    $('.removeResultsButton').click(function () {
+            var job = $(this).attr("data-delete-job_id")
+            alert(job)
+            $('#' + job).remove();
+        }
+    );
 }
 
 function tests_for_job(data) {
