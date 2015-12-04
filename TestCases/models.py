@@ -22,6 +22,7 @@ class Job(models.Model):
     job_hudson_shell_command = models.TextField(verbose_name="Job hudson shell command settings", null=True)
     job_up_stream = models.ForeignKey("self", null=True)
     job_enabled = models.BooleanField(verbose_name="Is job enabled", default=True)
+    job_successful = models.BooleanField(verbose_name="Is job successful", default=True)
 
     def __str__(self):
         return self.job_name

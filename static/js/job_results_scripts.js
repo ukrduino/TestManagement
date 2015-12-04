@@ -35,7 +35,6 @@ function show_jobs_results_in_template(data) {
     $('[data-toggle="tooltip"]').tooltip()
     $('.removeResultsButton').click(function () {
             var job = $(this).attr("data-delete-job_id")
-            alert(job)
             $('#' + job).remove();
         }
     );
@@ -93,5 +92,13 @@ function filter_jobs_results_by_env(env){
     if(env == "DEV1"){
         $(".jobs_results_table").hide();
         $("[id*='DEV1']").show()
+    }
+    if(env == "FAILED"){
+        $(".success_True").hide();
+        $(".success_False").show();
+    }
+    if(env == "PASSED"){
+        $(".success_True").show();
+        $(".success_False").hide();
     }
 }

@@ -1,6 +1,6 @@
 {% load staticfiles %}
 {% for job_in_header, builds in jobs_with_builds.items %}
-    <div class="table-responsive" id="del_{{ job_in_header.id }}">
+    <div class="table-responsive success_{{ job_in_header.job_successful }}" id="del_{{ job_in_header.id }}">
     <table class="table table-bordered jobs_results_table" id="{{ job_in_header.job_name }}">
         <thead>
         <tr>

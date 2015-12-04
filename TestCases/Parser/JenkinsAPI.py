@@ -256,3 +256,7 @@ def process_report(job_jenkins_page, new_build, html_report):
         for app_version in app_version_search_result:
             new_build.build_app_ver = app_version.split()[0][2:7]
     new_build.save()
+    job = new_build.job
+    job.job_successful = new_build.build_successful
+    job.save()
+
