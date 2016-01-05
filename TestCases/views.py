@@ -1,8 +1,7 @@
 import json
 
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response, HttpResponse, redirect
-from django.template import RequestContext
+from django.shortcuts import HttpResponse, redirect, render
 
 from TestCases.Parser import JavaTestsParser, JenkinsAPI
 from TestCases.forms import *
@@ -19,12 +18,12 @@ def home(request):
     args["jobs_number"] = Job.objects.all().count()
     args["groups_number"] = TestGroup.objects.all().count()
     args["builds_number"] = JobBuild.objects.all().count()
-    return render_to_response("HomePage.html", args, context_instance=RequestContext(request))
+    return render(request, "HomePage.html", args)
 
 
 # Data section
 def data_collection_page(request):
-    return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
+    return render(request, "DataCollectionPage.html")
 
 
 def delete(request):
@@ -50,7 +49,54 @@ def delete(request):
             time_stamp.get_builds_and_save_results_acceptance = "no data"
             time_stamp.get_builds_and_save_results_new_trunk = "no data"
             time_stamp.save()
-    return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
+    return render(request, "DataCollectionPage.html")
+
+
+# def super_update(request):
+#     print(1)
+#     logger.info(" > cleaning DB (deleting Test classes and Test cases)")
+#     TestClass.objects.all().delete()
+#     TestCase.objects.all().delete()
+#     logger.info(" > cleaning DB (deleting Groups)")
+#     TestGroup.objects.all().delete()
+#     logger.info(" > cleaning DB (deleting Jobs)")
+#     Job.objects.all().delete()
+#     logger.info(" > cleaning DB (deleting JobBuilds, TestResult)")
+#     JobBuild.objects.all().delete()
+#     TestResult.objects.all().delete()
+#     DataCollectionTimeStamps.objects.all().delete()
+#     time_stamp = init_data_collection_time_stamps()
+#     time_stamp.save()
+#     print(2)
+#     parse_java_code(request)
+#     print(3)
+#     save_instances_to_db(request)
+#     print(4)
+#     JenkinsAPI.get_jobs_from_jenkins(ACCEPTANCE_URL, EXCLUDED_ACCEPTANCE_JOBS, ACCEPTANCE)
+#     time_stamp.get_jobs_acceptance = timezone.now().strftime("%d %b %H:%M")
+#     time_stamp.save()
+#     JenkinsAPI.get_jobs_from_jenkins(NEW_TRUNK_URL, EXCLUDED_NEW_TRUNK_JOBS, NEW_TRUNK)
+#     time_stamp.get_jobs_new_trunk = timezone.now().strftime("%d %b %H:%M")
+#     time_stamp.save()
+#     JenkinsAPI.get_jobs_from_jenkins(ALL_OTHER_URL, EXCLUDED_ALL_OTHER_JOBS, ALL_OTHER)
+#     time_stamp.get_jobs_all_other = timezone.now().strftime("%d %b %H:%M")
+#     time_stamp.save()
+#     JenkinsAPI.add_config_data_to_jobs(ACCEPTANCE)
+#     time_stamp.get_jobs_configs_acceptance = timezone.now().strftime("%d %b %H:%M")
+#     time_stamp.save()
+#     JenkinsAPI.add_config_data_to_jobs(NEW_TRUNK)
+#     time_stamp.get_jobs_configs_new_trunk = timezone.now().strftime("%d %b %H:%M")
+#     time_stamp.save()
+#     # JenkinsAPI.add_config_data_to_jobs(ALL_OTHER)
+#     # time_stamp.get_jobs_configs_all_other = timezone.now().strftime("%d %b %H:%M")
+#     # time_stamp.save()
+#     JenkinsAPI.get_build_results_from_jenkins(ACCEPTANCE)
+#     time_stamp.get_builds_and_save_results_acceptance = timezone.now().strftime("%d %b %H:%M")
+#     time_stamp.save()
+#     JenkinsAPI.get_build_results_from_jenkins(NEW_TRUNK)
+#     time_stamp.get_builds_and_save_results_new_trunk = timezone.now().strftime("%d %b %H:%M")
+#     time_stamp.save()
+#     return render(request, "DataCollectionPage.html")
 
 
 def parse_java_code(request):
@@ -59,7 +105,7 @@ def parse_java_code(request):
     JavaTestsParser.get_tests_headers_from_java_code()
     time_stamp.parse_java_code = timezone.now().strftime("%d %b %H:%M")
     time_stamp.save()
-    return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
+    return render(request, "DataCollectionPage.html")
 
 
 def save_instances_to_db(request):
@@ -67,7 +113,7 @@ def save_instances_to_db(request):
     JavaTestsParser.create_instances_and_put_to_db()
     time_stamp.save_instances_to_db = timezone.now().strftime("%d %b %H:%M")
     time_stamp.save()
-    return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
+    return render(request, "DataCollectionPage.html")
 
 
 def get_jobs_from_jenkins(request):
@@ -84,7 +130,7 @@ def get_jobs_from_jenkins(request):
             JenkinsAPI.get_jobs_from_jenkins(ALL_OTHER_URL, EXCLUDED_ALL_OTHER_JOBS, ALL_OTHER)
             time_stamp.get_jobs_all_other = timezone.now().strftime("%d %b %H:%M")
         time_stamp.save()
-    return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
+    return render(request, "DataCollectionPage.html")
 
 
 def get_jobs_configs_from_jenkins(request):
@@ -101,7 +147,7 @@ def get_jobs_configs_from_jenkins(request):
             JenkinsAPI.add_config_data_to_jobs(ALL_OTHER)
             time_stamp.get_jobs_configs_all_other = timezone.now().strftime("%d %b %H:%M")
         time_stamp.save()
-    return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
+    return render(request, "DataCollectionPage.html")
 
 
 def get_builds_and_save_results(request):
@@ -115,27 +161,23 @@ def get_builds_and_save_results(request):
             JenkinsAPI.get_build_results_from_jenkins(NEW_TRUNK)
             time_stamp.get_builds_and_save_results_new_trunk = timezone.now().strftime("%d %b %H:%M")
         time_stamp.save()
-    return render_to_response("DataCollectionPage.html", context_instance=RequestContext(request))
+    return render(request, "DataCollectionPage.html")
 
 
 def search_jobs_page(request):
-    return render_to_response("JOBS_SEARCH_PAGE/SearchJobsPage.html", context_instance=RequestContext(request))
+    return render(request, "JOBS_SEARCH_PAGE/SearchJobsPage.html")
 
 
 def search_jobs_by_group_name(request):
     args = dict()
     args['found_jobs_list'] = search_jobs(request, BY_GROUP_NAME)
-    return render_to_response("JOBS_SEARCH_PAGE/JobsForSearchJobsPage.html",
-                              args,
-                              context_instance=RequestContext(request))
+    return render(request, "JOBS_SEARCH_PAGE/JobsForSearchJobsPage.html", args)
 
 
 def search_jobs_by_job_name(request):
     args = dict()
     args['found_jobs_list'] = search_jobs(request, BY_JOB_NAME)
-    return render_to_response("JOBS_SEARCH_PAGE/JobsForSearchJobsPage.html",
-                              args,
-                              context_instance=RequestContext(request))
+    return render(request, "JOBS_SEARCH_PAGE/JobsForSearchJobsPage.html", args)
 
 
 def search_jobs(request, by):
@@ -167,14 +209,12 @@ def search_group(request):
             groups = TestGroup.objects.filter(test_group_name__contains=group_name)
             groups_set.update(groups)
             args['found_groups_list'] = groups_set
-    return render_to_response("JOBS_SEARCH_PAGE/GroupsForSearchJobsPage.html",
-                              args,
-                              context_instance=RequestContext(request))
+    return render(request, "JOBS_SEARCH_PAGE/GroupsForSearchJobsPage.html", args)
 
 
 # JOBS RESULTS PAGE
 def jobs_results_page(request):
-    return render_to_response("JOBS_PAGE/JobsPage.html", context_instance=RequestContext(request))
+    return render(request, "JOBS_PAGE/JobsPage.html")
 
 
 def show_jobs_results(request):
@@ -185,7 +225,7 @@ def show_jobs_results(request):
         for job in Job.objects.filter(job_jenkins_page=jenkins_page):
             jobs_with_builds[job] = JobBuild.objects.filter(job__id=job.id).order_by('build_number')
     args['jobs_with_builds'] = jobs_with_builds
-    return render_to_response("JOBS_PAGE/JobsForJobsPage.html", args, context_instance=RequestContext(request))
+    return render(request, "JOBS_PAGE/JobsForJobsPage.html", args)
 
 
 def show_test_for_jobs(request):
@@ -219,7 +259,7 @@ def show_test_for_jobs(request):
                                        "test_name": test.test_class_name,
                                        "test_results": results_for_test})
         args['tests_with_results'] = tests_with_results
-    return render_to_response("JOBS_PAGE/TestsForJobsPage.html", args, context_instance=RequestContext(request))
+    return render(request, "JOBS_PAGE/TestsForJobsPage.html", args)
 
 
 def find_tests_for_job_from_builds(builds):
@@ -234,21 +274,29 @@ def find_tests_for_job_from_builds(builds):
 
 # JOBS CONFIGS PAGE
 def jobs_configs_page(request):
-    return render_to_response("JOBS_CONFIGS_PAGE/JobsConfigsPage.html", context_instance=RequestContext(request))
+    return render(request, "JOBS_CONFIGS_PAGE/JobsConfigsPage.html")
 
 
 # # GROUPS INFO PAGE
 def groups_page(request):
     args = dict()
-#     for group in TestGroup.objects.all():
-#         for job in group.job.all():
-#             if job.job_jenkins_page == ACCEPTANCE:
-#     # args['acceptance_groups'] = Job.objects.filter(job_jenkins_page=ACCEPTANCE)
-#     # args['trunk_groups'] = Job.objects.filter(job_jenkins_page=TRUNK)
-#     # args['new_trunk_groups'] = Job.objects.filter(job_jenkins_page=NEW_TRUNK)
-#     # args['all_groups'] = Job.objects.filter(job_jenkins_page=ALL_JOBS)
-#     # args['no_jobs_groups'] =
-    return render_to_response("GroupsPage.html", args, context_instance=RequestContext(request))
+    args['acceptance_groups'] = [group.test_group_name for group in TestGroup.objects.filter(job__job_jenkins_page=ACCEPTANCE)]
+    args['new_trunk_groups'] = [group.test_group_name for group in TestGroup.objects.filter(job__job_jenkins_page=NEW_TRUNK)]
+    all_other_groups = [group.test_group_name for group in TestGroup.objects.filter(job__job_jenkins_page=ALL_OTHER)]
+    args['all_other_groups'] = list()
+    for group_name in all_other_groups:
+        if group_name not in args['acceptance_groups']:
+            if group_name not in args['new_trunk_groups']:
+                args['all_other_groups'].append(group_name)
+    no_jobs_groups = [group.test_group_name for group in TestGroup.objects.filter(job=None)]
+    args['no_jobs_groups'] = list()
+    for group_name in no_jobs_groups:
+        if group_name not in args['acceptance_groups']:
+            if group_name not in args['new_trunk_groups']:
+                if group_name not in args['all_other_groups']:
+                    args['no_jobs_groups'].append(group_name)
+
+    return render(request, "GroupsPage.html", args)
 
 
 def show_jobs_configs(request):
@@ -256,13 +304,11 @@ def show_jobs_configs(request):
     if request.method == 'POST':
         jenkins_page = request.POST['jenkins_page']
         args["jobs"] = Job.objects.filter(job_jenkins_page=jenkins_page)
-    return render_to_response("JOBS_CONFIGS_PAGE/JobForJobsConfigsPage.html",
-                              args,
-                              context_instance=RequestContext(request))
+    return render(request, "JOBS_CONFIGS_PAGE/JobForJobsConfigsPage.html", args)
 
 
 # TODO REFACTORING
-def show_all_test_cases(request):
+def show_all_disabled_test_cases(request):
     args = dict()
     test_case_with_test_class = dict()
     for test_case in TestCase.objects.all()[555:600]:
@@ -272,9 +318,7 @@ def show_all_test_cases(request):
         test_class_with_groups[test_class] = groups
         test_case_with_test_class[test_case] = test_class_with_groups
     args["test_case_with_test_class"] = test_case_with_test_class
-    return render_to_response("TEST_CLASSES_PAGE/TestClassesPage.html",
-                              args,
-                              context_instance=RequestContext(request))
+    return render(request, "TEST_CLASSES_PAGE/TestClassesPage.html", args)
 
 
 # http://stackoverflow.com/a/32466453
@@ -301,9 +345,7 @@ def todo_page(request):
     args = dict()
     args['form'] = CreateToDoNoteForm
     args["to_do_notes"] = ToDoNote.objects.all().order_by('-id')
-    return render_to_response("TODO_PAGE/ToDoPage.html",
-                              args,
-                              context_instance=RequestContext(request))
+    return render(request, "TODO_PAGE/ToDoPage.html", args)
 
 
 def new_todo(request):
@@ -320,9 +362,7 @@ def edit_todo_page(request, todo_id):
     to_do_note = ToDoNote.objects.get(id=todo_id)
     args['form'] = EditToDoNoteForm(instance=to_do_note)
     args["to_do_note"] = to_do_note
-    return render_to_response("TODO_PAGE/EditToDoPage.html",
-                              args,
-                              context_instance=RequestContext(request))
+    return render(request, "TODO_PAGE/EditToDoPage.html", args)
 
 
 def edit_todo_save(request, todo_id):

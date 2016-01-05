@@ -17,6 +17,19 @@ $('#parse_java_code').click(function (event) {
     });
 });
 
+//$('#super_update').click(function (event) {
+//    event.preventDefault();
+//    displayOverlay("SUPER UPDATE ....");
+//    $.ajax({
+//        url: 'super_update/',
+//        type: 'get',
+//        success: function () {
+//            removeOverlay();
+//            updateTimeStamps();
+//        }
+//    });
+//});
+
 $('#save_instances_to_db').click(function (event) {
     event.preventDefault();
     show_progress_bar('#save_instances_to_db_progress');
