@@ -1,14 +1,6 @@
 local_settings.py
-db.sqlite3
-## Directory-based project format:
 .idea/
 TestCases/migrations/
 temp/
-
-### Python template
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
 
 

@@ -161,6 +161,11 @@ def get_build_results_from_jenkins(job_jenkins_page):
     firefox_profile = webdriver.FirefoxProfile(LOCAL_FIREFOX_PROFILE)
     driver = webdriver.Firefox(firefox_profile)
     driver.implicitly_wait(10)
+    # logging to Jenkins
+    driver.get(JENKINS_LOGIN_URL)
+    driver.find_element_by_name("j_username").send_keys(USER_NAME)
+    driver.find_element_by_name("j_password").send_keys(PASSWORD)
+    driver.find_element_by_name("Submit").click()
     for job in job_objects:
         try:
             job_inst = server.get_job(job.job_name)
